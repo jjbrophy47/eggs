@@ -23,7 +23,7 @@ python3 experiments/scripts/performance.py \
   --feature_type $feature_type \
   --test_type $test_type \
   --base_estimator $base_estimator \
-  --relations $relations \
+  --relations "{$relations[@]}" \
   --sgl_method $sgl_method \
   --sgl_stacks $sgl_stacks \
   --pgm $pgm
