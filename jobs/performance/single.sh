@@ -31,8 +31,8 @@ for feature_type in ${feature_type_list[@]}; do
                    --time=$time \
                    --partition=$partition \
                    --job-name=EP_$dataset \
-                   --output=jobs/logs/peformance/$dataset \
-                   --error=jobs/errors/peformance/$dataset \
+                   --output=jobs/logs/performance/$dataset \
+                   --error=jobs/errors/performance/$dataset \
                    jobs/performance/baseline.sh $dataset $rs \
                    $feature_type $test_type $base_estimator
 
@@ -44,8 +44,8 @@ for feature_type in ${feature_type_list[@]}; do
                            --time=$time \
                            --partition=$partition \
                            --job-name=EP_$dataset \
-                           --output=jobs/logs/peformance/$dataset \
-                           --error=jobs/errors/peformance/$dataset \
+                           --output=jobs/logs/performance/$dataset \
+                           --error=jobs/errors/performance/$dataset \
                            jobs/performance/eggs.sh $dataset $rs \
                            $feature_type $test_type $base_estimator \
                            $relations $sgl_method $sgl_stacks 'None'
@@ -59,8 +59,8 @@ for feature_type in ${feature_type_list[@]}; do
                        --time=$time \
                        --partition=$partition \
                        --job-name=EP_$dataset \
-                       --output=jobs/logs/peformance/$dataset \
-                       --error=jobs/errors/peformance/$dataset \
+                       --output=jobs/logs/performance/$dataset \
+                       --error=jobs/errors/performance/$dataset \
                        jobs/performance/eggs.sh $dataset $rs \
                        $feature_type $test_type $base_estimator \
                        $relations 'None' 0 $pgm
@@ -75,8 +75,8 @@ for feature_type in ${feature_type_list[@]}; do
                                --time=$time \
                                --partition=$partition \
                                --job-name=EP_$dataset \
-                               --output=jobs/logs/peformance/$dataset \
-                               --error=jobs/errors/peformance/$dataset \
+                               --output=jobs/logs/performance/$dataset \
+                               --error=jobs/errors/performance/$dataset \
                                jobs/performance/eggs.sh $dataset $rs \
                                $feature_type $test_type $base_estimator \
                                $relations $sgl_method $sgl_stacks $pgm
