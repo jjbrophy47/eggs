@@ -16,11 +16,11 @@ sgl_stacks=$7
 pgm=$8
 
 if [ $dataset == 'youtube' ]; then
-    relations=('user text')
+    relations=('user' 'text')
 elif [ $dataset == 'twitter' ]; then
-    relations=('user text hashuser')
+    relations=('user' 'text' 'hashuser')
 elif [ $dataset == 'soundcloud' ]; then
-    relations=('user text link')
+    relations=('user' 'text' 'link')
 else
     echo 'Unknown dataset!'
 fi
