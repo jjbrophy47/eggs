@@ -26,19 +26,20 @@ for feature_type in ${feature_type_list[@]}; do
     for test_type in ${test_type_list[@]}; do
         for base_estimator in ${base_estimator_list[@]}; do
 
-        sbatch --cpus-per-task=$cpu \
-               --time=$time \
-               --partition=$partition \
-               --job-name=EP_$dataset \
-               --output=jobs/logs/peformance/$dataset \
-               --error=jobs/errors/peformance/$dataset \
-               jobs/performance/baseline.sh $dataset $rs \
-               $feature_type $test_type $base_estimator
+            # baseline
+            sbatch --cpus-per-task=$cpu \
+                   --time=$time \
+                   --partition=$partition \
+                   --job-name=EP_$dataset \
+                   --output=jobs/logs/peformance/$dataset \
+                   --error=jobs/errors/peformance/$dataset \
+                   jobs/performance/baseline.sh $dataset $rs \
+                   $feature_type $test_type $base_estimator
 
-            # SGL only
             for sgl_method in ${sgl_method_list[@]}; do
                 for sgl_stacks in ${sgl_stacks_list[@]}; do
 
+                    # SGL only
                     sbatch --cpus-per-task=$cpu \
                            --time=$time \
                            --partition=$partition \
@@ -48,10 +49,12 @@ for feature_type in ${feature_type_list[@]}; do
                            jobs/performance/eggs.sh $dataset $rs \
                            $feature_type $test_type $base_estimator \
                            $relations $sgl_method $sgl_stacks 'None'
+                done
+            done
 
-            # PGM only
             for pgm in ${pgm_list[@]}; do
 
+                # PGM only
                 sbatch --cpus-per-task=$cpu \
                        --time=$time \
                        --partition=$partition \
@@ -61,12 +64,13 @@ for feature_type in ${feature_type_list[@]}; do
                        jobs/performance/eggs.sh $dataset $rs \
                        $feature_type $test_type $base_estimator \
                        $relations 'None' 0 $pgm
+            done
 
-            # SGL + PGM
             for sgl_method in ${sgl_method_list[@]}; do
                 for sgl_stacks in ${sgl_stacks_list[@]}; do
                     for pgm in ${pgm_list[@]}; do
 
+                        # SGL + PGM
                         sbatch --cpus-per-task=$cpu \
                                --time=$time \
                                --partition=$partition \
@@ -76,6 +80,9 @@ for feature_type in ${feature_type_list[@]}; do
                                jobs/performance/eggs.sh $dataset $rs \
                                $feature_type $test_type $base_estimator \
                                $relations $sgl_method $sgl_stacks $pgm
+                    done
+                done
+            done
         done
     done
 done
