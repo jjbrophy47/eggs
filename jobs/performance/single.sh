@@ -12,12 +12,11 @@ sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
 pgm_list=('psl' 'mrf')
 
-if [$dataset == 'youtube']
-then
+if [ $dataset == 'youtube' ]; then
     relations=('user text')
-elif [$dataset == 'twitter']
+elif [ $dataset == 'twitter' ]; then
     relations=('user text hashuser')
-elif [$dataset == 'soundcloud']
+elif [ $dataset == 'soundcloud' ]; then
     relations=('user text link')
 else
     echo 'Unknown dataset!'
