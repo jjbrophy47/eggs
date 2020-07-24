@@ -5,7 +5,7 @@
 ---
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jjbrophy47/eggs/master)
 
-**EGGS** (**E**xtended **G**roup-based **G**raphical-models for **S**pam) is an approach that combines multiple relational-modeling techniques, specifially stacked graphical learning (SGL) and probabilistic graphical modeling (PGM), on top of a traditional classifier resulting in a comprehensive model that can flexibly capture any independent and/or relational signal in the data.
+**EGGS** (**E**xtended **G**roup-based **G**raphical-models for **S**pam) is an approach that combines multiple relational-modeling techniques, specifically stacked graphical learning (SGL) and probabilistic graphical modeling (PGM), on top of a traditional classifier; the result is a comprehensive model that can flexibly capture any independent and/or relational signal in the data.
 
 Install
 ---

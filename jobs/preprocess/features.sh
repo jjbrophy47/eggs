@@ -7,13 +7,13 @@ module load python3/3.7.5
 dataset=$1
 nrows=$2
 
-python3 experiments/preprocess/features.py \
+python3 scripts/preprocess/features.py \
   --dataset $dataset \
   --feature_type 'limited' \
   --relations \
   --nrows $nrows
 
-python3 experiments/preprocess/features.py \
+python3 scripts/preprocess/features.py \
   --dataset $dataset \
   --feature_type 'full' \
   --nrows $nrows
