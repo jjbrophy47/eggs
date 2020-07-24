@@ -11,10 +11,19 @@ rs=$2
 feature_type=$3
 test_type=$4
 base_estimator=$5
-relations=$6
-sgl_method=$7
-sgl_stacks=$8
-pgm=$9
+sgl_method=$6
+sgl_stacks=$7
+pgm=$8
+
+if [ $dataset == 'youtube' ]; then
+    relations=('user text')
+elif [ $dataset == 'twitter' ]; then
+    relations=('user text hashuser')
+elif [ $dataset == 'soundcloud' ]; then
+    relations=('user text link')
+else
+    echo 'Unknown dataset!'
+fi
 
 python3 experiments/scripts/performance.py \
   --eggs \

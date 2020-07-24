@@ -12,16 +12,6 @@ sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
 pgm_list=('psl' 'mrf')
 
-if [ $dataset == 'youtube' ]; then
-    relations=('user text')
-elif [ $dataset == 'twitter' ]; then
-    relations=('user text hashuser')
-elif [ $dataset == 'soundcloud' ]; then
-    relations=('user text link')
-else
-    echo 'Unknown dataset!'
-fi
-
 for feature_type in ${feature_type_list[@]}; do
     for test_type in ${test_type_list[@]}; do
         for base_estimator in ${base_estimator_list[@]}; do
@@ -48,7 +38,7 @@ for feature_type in ${feature_type_list[@]}; do
                            --error=jobs/errors/performance/$dataset \
                            jobs/performance/eggs.sh $dataset $rs \
                            $feature_type $test_type $base_estimator \
-                           $relations $sgl_method $sgl_stacks 'None'
+                           $sgl_method $sgl_stacks 'None'
                 done
             done
 
@@ -63,7 +53,7 @@ for feature_type in ${feature_type_list[@]}; do
                        --error=jobs/errors/performance/$dataset \
                        jobs/performance/eggs.sh $dataset $rs \
                        $feature_type $test_type $base_estimator \
-                       $relations 'None' 0 $pgm
+                       'None' 0 $pgm
             done
 
             for sgl_method in ${sgl_method_list[@]}; do
@@ -79,7 +69,7 @@ for feature_type in ${feature_type_list[@]}; do
                                --error=jobs/errors/performance/$dataset \
                                jobs/performance/eggs.sh $dataset $rs \
                                $feature_type $test_type $base_estimator \
-                               $relations $sgl_method $sgl_stacks $pgm
+                               $sgl_method $sgl_stacks $pgm
                     done
                 done
             done
