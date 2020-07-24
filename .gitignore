@@ -17,3 +17,5 @@ experiments/scripts/__pycache__
 experiments/notebooks/.*
 
 .temp
+
+temp_performance

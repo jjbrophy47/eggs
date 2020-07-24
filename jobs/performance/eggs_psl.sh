@@ -20,7 +20,7 @@ else
 fi
 
 feature_type_list=('full' 'limited')
-test_type_list=('full' 'limited')
+test_type_list=('full' 'inductive')
 base_estimator_list=('lr' 'lgb')
 
 sgl_method_list=('holdout' 'cv')

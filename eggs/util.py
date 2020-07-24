@@ -138,10 +138,13 @@ def _create_feature(y_hat, target_ids, fp, relation, return_sparse=True):
     """
 
     relation_id = '{}_id'.format(relation)
-    feature_name = relation_id.split('_')[0] + '_relation'
+    feature_name = '{}_relation'.format(relation)
 
     # get relational info
     rel_df = pd.read_csv(fp)[['com_id', relation_id]]
+
+    # remove duplicates, unimportant for pseudo-relational features
+    rel_df = rel_df.drop_duplicates(subset=['com_id'])
 
     # merge predictions with relational information
     data_df = pd.DataFrame(list(zip(y_hat, target_ids)), columns=['y_hat', 'com_id'])

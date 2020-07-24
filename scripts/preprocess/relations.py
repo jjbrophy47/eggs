@@ -155,5 +155,6 @@ def create_hashuser_relation(train_df, val_df, test_df, sets=False, verbose=0):
 
     rf = hashuser_df.merge(unique_hashusers, on=['hash', 'user_id'], how='left')
     rf = rf[~pd.isnull(rf['hashuser_id'])]
+    rf = rf.drop_duplicates()
 
     return rf
