@@ -10,7 +10,16 @@ base_estimator_list=('lr' 'lgb')
 
 sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
-pgm_list=('psl' 'mrf')
+pgm_list=('mrf')
+
+# PSL cannot run parallel jobs due to database connection
+sbatch --cpus-per-task=$cpu \
+       --time=$time \
+       --partition=$partition \
+       --job-name=EP_$dataset \
+       --output=jobs/logs/performance/$dataset \
+       --error=jobs/errors/performance/$dataset \
+       jobs/performance/eggs_psl.sh $dataset $rs
 
 for feature_type in ${feature_type_list[@]}; do
     for test_type in ${test_type_list[@]}; do
