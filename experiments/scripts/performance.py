@@ -120,7 +120,8 @@ def main(args):
     # create output directory
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
-                           args.base_estimator,
+                           'rs_{}'.format(args.rs),
+                           'base_{}'.format(args.base_estimator),
                            'feature_{}'.format(args.feature_type),
                            'test_{}'.format(args.test_type),
                            'sgl_{}'.format(args.sgl_method),

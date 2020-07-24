@@ -29,8 +29,6 @@ class PGM:
         ----------
         relations : list
             Relations to use for relational modeling.
-        # relations_func : func (default=None)
-        #     Domain-dependent helper method to generate pgm files.
         pgm_type : str (default='psl') {'psl', 'mrf'}
             Type of PGM to use for joint inference.
         data_dir : str (default='data')
@@ -41,7 +39,6 @@ class PGM:
             Saving output.
         """
         self.relations = relations
-        # self.relations_func = relations_func
         self.pgm_type = pgm_type
         self.data_dir = data_dir
         self.working_dir = os.path.join(working_dir, str(uuid.uuid4()))

@@ -5,6 +5,7 @@ notes
 
 eggs/psl/
 eggs/psl-examples/
+eggs/__pycache__
 
 jobs/errors/
 jobs/logs/

@@ -109,6 +109,29 @@ def cross_val_predict(X,
     return p
 
 
+def hstack(blocks):
+    """
+    Horizontally stacks sparse or non-sparse blocks.
+    """
+
+    # checks if all blocks are sparse
+    sparse_blocks = 0
+    for block in blocks:
+        if sparse.issparse(block):
+            sparse_blocks += 1
+
+    # stacks the blocks together
+    if sparse_blocks == len(blocks):
+        result = sparse.hstack(blocks).tocsr()
+    elif sparse_blocks == 0:
+        result = np.hstack(blocks)
+    else:
+        raise ValueError('Sparse and non-sparse blocks present!')
+
+    return result
+
+
+# private
 def _create_feature(y_hat, target_ids, fp, relation, return_sparse=True):
     """
     Generates pseudo-relational feature values for a given relation.
@@ -144,25 +167,3 @@ def _create_feature(y_hat, target_ids, fp, relation, return_sparse=True):
         x = sparse.csr_matrix(x)
 
     return x, feature_name
-
-
-def hstack(blocks):
-    """
-    Horizontally stacks sparse or non-sparse blocks.
-    """
-
-    # checks if all blocks are sparse
-    sparse_blocks = 0
-    for block in blocks:
-        if sparse.issparse(block):
-            sparse_blocks += 1
-
-    # stacks the blocks together
-    if sparse_blocks == len(blocks):
-        result = sparse.hstack(blocks).tocsr()
-    elif sparse_blocks == 0:
-        result = np.hstack(blocks)
-    else:
-        raise ValueError('Sparse and non-sparse blocks present!')
-
-    return result

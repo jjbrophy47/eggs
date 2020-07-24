@@ -1,6 +1,8 @@
 """
 This class implements stacked graphical learning (SGL).
 """
+import time
+
 import numpy as np
 from sklearn.base import clone
 from sklearn.utils.validation import check_X_y
@@ -158,20 +160,23 @@ class SGL:
 
         # fit a base model, and stacked models using pseudo-relational features
         for i in range(self.stacks + 1):
+            start = time.time()
+
             X = Xg_list[i] if i == 0 else util.hstack([Xg_list[i], pr_features[i - 1][i]])
-            print(i, X.shape, y_list[i].shape)
             fit_model = clone(self.estimator).fit(X, y_list[i])
             self.stacked_models_.append(fit_model)
 
             # generate predictions for all subsequent data pieces
             for j in range(i + 1, self.stacks + 1):
-                print(i, j, Xg_list[j].shape)
                 X = Xg_list[j] if i == 0 else util.hstack([Xg_list[j], pr_features[i - 1][j]])
                 y_hat = fit_model.predict_proba(X)[:, 1]
                 Xr, Xr_cols = util.pseudo_relational_features(y_hat, target_ids_list[j],
                                                               relations=self.relations,
                                                               data_dir=self.data_dir)
                 pr_features[i][j] = Xr
+
+            if self.logger:
+                self.logger.info('stack {}: {:.3f}s'.format(i, time.time() - start))
 
         # save pseudo-relational features
         self.Xr_cols = Xr_cols
