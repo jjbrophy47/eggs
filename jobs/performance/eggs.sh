@@ -4,7 +4,7 @@
 #SBATCH --account=uoml
 module load python3/3.7.5
 module load libra/1.1.2
-modeul load java/1.8.0
+module load java/1.8.0
 
 dataset=$1
 rs=$2
