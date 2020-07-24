@@ -130,6 +130,10 @@ def main(args):
     log_fp = os.path.join(out_dir, 'log.txt')
     os.makedirs(out_dir, exist_ok=True)
 
+    # skip experiment if results already exist
+    if args.append_results and os.path.exists(log_fp.replace('.txt', '.npy')):
+        return
+
     # create logger
     logger = util.get_logger(log_fp)
     logger.info(args)
@@ -169,6 +173,7 @@ if __name__ == '__main__':
     # extra settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+    parser.add_argument('--append_results', action='store_true', default=False, help='skip finished results.')
 
     args = parser.parse_args()
     main(args)

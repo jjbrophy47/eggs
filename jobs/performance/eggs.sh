@@ -26,6 +26,7 @@ else
 fi
 
 python3 experiments/scripts/performance.py \
+  --append_results \
   --eggs \
   --dataset $dataset \
   --rs $rs \

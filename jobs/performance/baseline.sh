@@ -13,6 +13,7 @@ test_type=$4
 base_estimator=$5
 
 python3 experiments/scripts/performance.py \
+  --append_results \
   --dataset $dataset \
   --rs $rs \
   --feature_type $feature_type \

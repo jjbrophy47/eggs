@@ -31,6 +31,7 @@ for feature_type in ${feature_type_list[@]}; do
         for base_estimator in ${base_estimator_list[@]}; do
 
             python3 experiments/scripts/performance.py \
+              --append_results \
               --eggs \
               --dataset $dataset \
               --rs $rs \
@@ -44,6 +45,7 @@ for feature_type in ${feature_type_list[@]}; do
                 for sgl_stacks in ${sgl_stacks_list[@]}; do
 
                     python3 experiments/scripts/performance.py \
+                      --append_results \
                       --eggs \
                       --dataset $dataset \
                       --rs $rs \
