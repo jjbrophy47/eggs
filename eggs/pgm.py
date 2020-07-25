@@ -19,6 +19,7 @@ class PGM:
     def __init__(self,
                  relations,
                  pgm_type='psl',
+                 psl_learner='mle',
                  data_dir='data',
                  working_dir='.temp',
                  logger=None):
@@ -40,6 +41,7 @@ class PGM:
         """
         self.relations = relations
         self.pgm_type = pgm_type
+        self.psl_learner = psl_learner
         self.data_dir = data_dir
         self.working_dir = os.path.join(working_dir, str(uuid.uuid4()))
         self.logger = logger
@@ -60,18 +62,20 @@ class PGM:
             self.logger.info('\nPGM: {}'.format(self.pgm_type))
 
         if self.pgm_type == 'psl':
-            pgm_class = PSL
+            pgm = PSL(relations=self.relations,
+                      data_dir=self.data_dir,
+                      working_dir=self.working_dir,
+                      learner=self.psl_learner,
+                      logger=self.logger)
 
         elif self.pgm_type == 'mrf':
-            pgm_class = MRF
+            pgm = MRF(relations=self.relations,
+                      data_dir=self.data_dir,
+                      working_dir=self.working_dir,
+                      logger=self.logger)
 
         else:
             raise ValueError('pgm_type {} unknown!'.format(self.pgm_type))
-
-        pgm = pgm_class(relations=self.relations,
-                        data_dir=self.data_dir,
-                        working_dir=self.working_dir,
-                        logger=self.logger)
 
         self.pgm_ = pgm.fit(y, y_hat, target_col)
 

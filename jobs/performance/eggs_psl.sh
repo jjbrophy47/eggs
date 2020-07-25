@@ -25,34 +25,45 @@ base_estimator_list=('lr' 'lgb')
 
 sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
+psl_learner_list('mle' 'gpp')
 
 for feature_type in ${feature_type_list[@]}; do
     for test_type in ${test_type_list[@]}; do
         for base_estimator in ${base_estimator_list[@]}; do
 
-            python3 experiments/scripts/performance.py \
-              --append_results \
-              --eggs \
-              --dataset $dataset \
-              --rs $rs \
-              --feature_type $feature_type \
-              --test_type $test_type \
-              --base_estimator $base_estimator \
-              --relations "${relations[@]}" \
-              --pgm 'psl'
+            for psl_learner in ${psl_learner_list[@]}; do
 
-            for sgl_method in ${sgl_method_list[@]}; do
-                for sgl_stacks in ${sgl_stacks_list[@]}; do
+                python3 experiments/scripts/performance.py \
+                  --append_results \
+                  --eggs \
+                  --dataset $dataset \
+                  --rs $rs \
+                  --feature_type $feature_type \
+                  --test_type $test_type \
+                  --base_estimator $base_estimator \
+                  --relations "${relations[@]}" \
+                  --pgm 'psl' \
+                  --psl_learner $psl_learner
 
-                    python3 experiments/scripts/performance.py \
-                      --append_results \
-                      --eggs \
-                      --dataset $dataset \
-                      --rs $rs \
-                      --feature_type $feature_type \
-                      --test_type $test_type \
-                      --base_estimator $base_estimator \
-                      --relations "${relations[@]}" \
-                      --sgl_method $sgl_method \
-                      --sgl_stacks $sgl_stacks \
-                      --pgm 'psl'
+                for sgl_method in ${sgl_method_list[@]}; do
+                    for sgl_stacks in ${sgl_stacks_list[@]}; do
+
+                        python3 experiments/scripts/performance.py \
+                          --append_results \
+                          --eggs \
+                          --dataset $dataset \
+                          --rs $rs \
+                          --feature_type $feature_type \
+                          --test_type $test_type \
+                          --base_estimator $base_estimator \
+                          --relations "${relations[@]}" \
+                          --sgl_method $sgl_method \
+                          --sgl_stacks $sgl_stacks \
+                          --pgm 'psl' \
+                          --psl_learner $psl_learner
+                    done
+                done
+            done
+        done
+    done
+done

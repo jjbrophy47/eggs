@@ -26,6 +26,7 @@ class PSL:
                  relations,
                  data_dir='data',
                  working_dir='.temp',
+                 learner='mle',
                  logger=None):
         """
         Initialization of joint inference class.
@@ -34,18 +35,20 @@ class PSL:
         ----------
         relations : list
             Relations to use for relational modeling.
-        # relations_func : func (default=None)
-        #     Domain-dependent helper method to generate pgm files.
-        working_dir : str (default='.temp/')
+        data_dir : str (default='data')
             Temporary directory to store intermdiate files.
-        working_dir : str (default='.temp/')
+        working_dir : str (default='.temp')
             Temporary directory to store intermdiate files.
         logger : object (default=None)
             Logger for logging output.
+        learner : str (default='mle')
+            Weight learning optimizer, 'mle': Maximum Likelihood,
+            'gpp': Gaussian Process Prior (uses the Ranking Estimator).
         """
         self.relations = relations
         self.data_dir = data_dir
         self.working_dir = working_dir
+        self.learner = learner
         self.logger = logger
 
     # public
@@ -73,12 +76,23 @@ class PSL:
         self._add_data(self.model_, target_col=target_col, target_priors=target_priors,
                        relations_dict=relations_dict, y=y)
 
-        # train
+        # start timing
         start = time.time()
         if self.logger:
             self.logger.info('[PSL] training...')
 
-        self.model_.learn(temp_dir=self.working_dir,
+        # learning settings
+        optimizer = ''
+        additional_cli_options = []
+
+        if self.learner == 'gpp':
+            optimizer = 'GaussianProcessPrior'
+            additional_cli_options = ['-e', 'RankingEvaluator']
+
+        # train
+        self.model_.learn(method=optimizer,
+                          additional_cli_optons=additional_cli_options,
+                          temp_dir=self.working_dir,
                           jvm_options=JVM_OPTIONS,
                           logger=self.logger)
 

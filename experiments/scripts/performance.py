@@ -40,6 +40,7 @@ def _get_model(args, data_dir, logger):
                                     sgl_method=args.sgl_method,
                                     sgl_stacks=args.sgl_stacks,
                                     pgm=args.pgm,
+                                    psl_learner=args.psl_learner,
                                     data_dir=data_dir,
                                     logger=logger,
                                     random_state=args.rs)
@@ -127,11 +128,14 @@ def main(args):
                            'sgl_{}'.format(args.sgl_method),
                            'stacks_{}'.format(args.sgl_stacks),
                            'pgm_{}'.format(args.pgm))
+    if args.pgm == 'psl':
+        out_dir = os.path.join(out_dir, 'psl_{}'.format(args.psl_learner))
+
     log_fp = os.path.join(out_dir, 'log.txt')
     os.makedirs(out_dir, exist_ok=True)
 
     # skip experiment if results already exist
-    if args.append_results and os.path.exists(log_fp.replace('.txt', '.npy')):
+    if args.append_results and os.path.exists(log_fp.replace('log.txt', 'result.npy')):
         return
 
     # create logger
@@ -149,7 +153,7 @@ def main(args):
 if __name__ == '__main__':
 
     # read in commandline args
-    parser = argparse.ArgumentParser(description='EGGS: Extended Group-based Graphical models for Spam')
+    parser = argparse.ArgumentParser(description='EGGS: Extended Group-based Graphical models for Spam.')
 
     # I/O settings
     parser.add_argument('--out_dir', type=str, default='output/performance/', help='output directory.')
@@ -167,8 +171,9 @@ if __name__ == '__main__':
     parser.add_argument('--eggs', action='store_true', default=False, help='use EGGS.')
     parser.add_argument('--relations', type=str, nargs='+', default=['user', 'text'], help='relations.')
     parser.add_argument('--sgl_method', type=str, default='None', help='training method.')
-    parser.add_argument('--sgl_stacks', type=int, default=0, help='number of SGL stacks')
-    parser.add_argument('--pgm', type=str, default='None', help='joint inference model (mrf or psl)')
+    parser.add_argument('--sgl_stacks', type=int, default=0, help='number of SGL stacks.')
+    parser.add_argument('--pgm', type=str, default='None', help='joint inference model (MRF or PSL).')
+    parser.add_argument('--psl_learner', type=str, default='mle', help='PSL weight learning.')
 
     # extra settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')

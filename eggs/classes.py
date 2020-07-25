@@ -25,6 +25,7 @@ class EGGSClassifier:
                  sgl_method=None,
                  sgl_stacks=2,
                  pgm=None,
+                 psl_learner='mle',
                  data_dir='data',
                  logger=None,
                  random_state=None):
@@ -37,12 +38,14 @@ class EGGSClassifier:
             Classifier with fit and predict methods.
         relations : list (default=None)
             Relations to use for relational modeling.
-        sgl_method : str {'cv', 'holdout', None} (default=None)
+        sgl_method : str {'cv', 'holdout', 'None'} (default='None')
             If not None, method for stacked graphical learning.
             Cross-validation (cv) or sequential (holdout).
         sgl_stacks : int (default=2)
             Number of stacks to use for SGL. Only relevant if sgl is not None.
-        pgm : str {'psl', 'mrf', None}
+        pgm : str (default='None') {'psl', 'mrf', 'None'}
+            Probabilistic graphical model to use for joint inference.
+        psl_learner : str (default='mle') {'mle', 'gpp'}
             Probabilistic graphical model to use for joint inference.
         data_dir : str (default='data')
             Dataset directory containing relational information.
@@ -56,6 +59,7 @@ class EGGSClassifier:
         self.sgl_method = sgl_method
         self.sgl_stacks = sgl_stacks
         self.pgm = pgm
+        self.psl_learner = psl_learner
         self.data_dir = data_dir
         self.logger = logger
         self.random_state = random_state
@@ -106,6 +110,7 @@ class EGGSClassifier:
             # train
             pgm = PGM(relations=self.relations,
                       pgm_type=self.pgm,
+                      psl_learner=self.psl_learner,
                       data_dir=self.data_dir,
                       logger=self.logger)
 
@@ -163,5 +168,6 @@ class EGGSClassifier:
         d['sgl_method'] = self.sgl_method
         d['sgl_stacks'] = self.sgl_stacks
         d['pgm'] = self.pgm
+        d['psl_learner'] = self.psl_learner
         d['logger'] = self.logger
         return d
