@@ -2,7 +2,6 @@
 This module identifies and filters out the test
 instances that have connections to training.
 """
-import numpy as np
 
 
 def get_inductive_indices(relations, train_df, test_df):
@@ -26,8 +25,6 @@ def get_inductive_indices(relations, train_df, test_df):
 
     # filter out messages with connections to training
     new_test_df = test_df[~test_df['com_id'].isin(test_ids)]
-    # print(new_test_df)
     indices = new_test_df['com_id'].to_numpy()
-    # indices = np.int32(new_test_df.index)
 
     return indices

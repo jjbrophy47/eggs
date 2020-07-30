@@ -19,7 +19,7 @@ def main(args):
     # create output directory
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
-                           'feature_{}'.format(args.feature_type),
+                           'eval_{}'.format(args.eval_set),
                            'test_{}'.format(args.test_type))
 
     log_fp = os.path.join(out_dir, 'log.txt')
@@ -33,16 +33,41 @@ def main(args):
     logger.info('\nDATA')
     in_dir = os.path.join(args.data_dir, args.dataset)
 
-    # read in label data
-    val_df = pd.read_csv(os.path.join(in_dir, 'y_val.csv'))
-    test_df = pd.read_csv(os.path.join(in_dir, 'y_test.csv'))
+    # concatenate target data from each fold
+    df_list = []
+    for fold in args.folds:
+        fp = os.path.join(in_dir,
+                          'fold_{}'.format(fold),
+                          'y_{}.csv'.format(args.eval_set))
+        df_list.append(pd.read_csv(fp))
+    test_df = pd.concat(df_list)
+
+    # concatenate relation data for each fold
+    relation_dict = {}
+
+    for relation in args.relations:
+        df_list = []
+
+        for fold in args.folds:
+            relation_col = '{}_id'.format(relation)
+
+            # read in relation data
+            fp = os.path.join(in_dir,
+                              'fold_{}'.format(fold),
+                              'relation_{}.csv'.format(relation))
+            relation_df = pd.read_csv(fp)
+            relation_df[relation_col] = relation_df[relation_col].astype(int)
+
+            # add data to list
+            df_list.append(relation_df)
+
+        # create concatenated dataframe
+        relation_dict[relation] = pd.concat(df_list)
 
     # filter out transductive test indices
     if args.test_type == 'inductive':
         indices = np.load(os.path.join(in_dir, 'inductive_indices.npz'))
-
-        val_df = val_df[val_df['com_id'].isin(indices['val'])]
-        test_df = test_df[test_df['com_id'].isin(indices['test'])]
+        test_df = test_df[test_df['com_id'].isin(indices[args.eval_set])]
 
     # extract label data
     y_test = test_df['label'].to_numpy()
@@ -56,10 +81,9 @@ def main(args):
     target_col = 'com_id'
     g = nx.Graph()
 
-    for relation in args.relations:
+    # create edges from target nodes to hub nodes
+    for relation, relation_df in relation_dict.items():
         relation_col = '{}_id'.format(relation)
-        relation_df = pd.read_csv(os.path.join(in_dir, 'relation_{}.csv'.format(relation)))
-        relation_df[relation_col] = relation_df[relation_col].astype(int)
 
         # filter messages not in this test set
         relation_df = relation_df[relation_df['com_id'].isin(target_ids_test)]
@@ -107,7 +131,12 @@ def main(args):
     df = pd.DataFrame(results)
     logger.info(df)
 
+    logger.info('saving results...')
+    df.to_csv(os.path.join(out_dir, 'results.csv'), index=None)
+
     # global statistics
+    logger.info('\nANALYSIS')
+
     num_components = len(df)
     num_edges = df['num_edges'].sum()
     logger.info('total no. components: {}, no. edges: {}'.format(num_components, num_edges))
@@ -146,8 +175,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, default='youtube', help='dataset.')
 
     # experiment settings
-    parser.add_argument('--feature_type', type=str, default='full', help='limited or full.')
+    parser.add_argument('--eval_set', type=str, default='test', help='val or test.')
     parser.add_argument('--test_type', type=str, default='full', help='inductive or full.')
+    parser.add_argument('--folds', type=int, nargs='+', default=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], help='folds.')
 
     # EGGS settings
     parser.add_argument('--relations', type=str, nargs='+', default=['user', 'text'], help='relations.')

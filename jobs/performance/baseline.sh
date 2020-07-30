@@ -11,6 +11,7 @@ rs=$2
 feature_type=$3
 test_type=$4
 base_estimator=$5
+fold=$6
 
 python3 experiments/scripts/performance.py \
   --append_results \
@@ -19,3 +20,4 @@ python3 experiments/scripts/performance.py \
   --feature_type $feature_type \
   --test_type $test_type \
   --base_estimator $base_estimator \
+  --fold $fold

@@ -54,7 +54,7 @@ def _get_model(args, data_dir, logger):
 def experiment(args, logger, out_dir):
 
     logger.info('\nDATA')
-    in_dir = os.path.join(args.data_dir, args.dataset)
+    in_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(args.fold))
 
     # read in feature data
     logger.info('reading in data...')
@@ -121,6 +121,7 @@ def main(args):
     # create output directory
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
+                           'fold_{}'.format(args.fold),
                            'rs_{}'.format(args.rs),
                            'base_{}'.format(args.base_estimator),
                            'feature_{}'.format(args.feature_type),
@@ -163,6 +164,7 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--feature_type', type=str, default='full', help='limited or full.')
     parser.add_argument('--test_type', type=str, default='full', help='inductive or full.')
+    parser.add_argument('--fold', type=int, default=0, help='dataset fold to use.')
     parser.add_argument('--base_estimator', type=str, default='lr', help='base estimator: lr or lgb.')
     parser.add_argument('--n_estimators', type=int, default=100, help='no. trees.')
     parser.add_argument('--max_depth', type=int, default=None, help='max depth of each tree.')
