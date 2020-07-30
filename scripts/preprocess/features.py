@@ -25,7 +25,6 @@ def _compute_features(args, logger, df, cv=None):
     """
     SoundCloud.
     """
-    df['text'] = df['text'].fillna('')
     features_df = df.copy()
 
     logger.info('adding graph features...')
@@ -172,33 +171,17 @@ def _generate_relations(args, train_df, val_df, test_df):
     return result
 
 
-def main(args):
+def make_dataset(args, df, fold, out_dir, logger):
 
-    # display settings
-    pd.set_option('display.width', 181)
-    pd.set_option('display.max_columns', 100)
-
-    # create logger
-    log_dir = os.path.join(args.log_dir, args.dataset, args.feature_type)
-    os.makedirs(log_dir, exist_ok=True)
-
-    logger_fp = os.path.join(log_dir, 'log.txt')
-    logger = util.get_logger(logger_fp)
-    logger.info(args)
-
-    # read in data
-    in_dir = os.path.join(args.data_dir, args.dataset, 'raw')
-    out_dir = os.path.join(args.data_dir, args.dataset)
-
-    train_df = pd.read_csv(os.path.join(in_dir, 'comments.csv'), nrows=args.nrows)
+    logger.info('\n\nFOLD {}'.format(fold))
 
     # split the data into train, val, and test
-    n_val = int(len(train_df) * args.val_frac)
-    n_test = int(len(train_df) * args.test_frac)
+    n_val = int(len(df) * args.val_frac)
+    n_test = int(len(df) * args.test_frac)
 
-    val_df = train_df[len(train_df) - n_test - n_val: len(train_df) - n_test]
-    test_df = train_df[len(train_df) - n_test:]
-    train_df = train_df[:len(train_df) - n_test - n_val]
+    val_df = df[len(df) - n_test - n_val: len(df) - n_test]
+    test_df = df[len(df) - n_test:]
+    train_df = df[:len(df) - n_test - n_val]
 
     # generate independent features
     logger.info('\nTRAIN')
@@ -249,8 +232,8 @@ def main(args):
         val_inductive_indices = get_inductive_indices(relations, train_df, val_df)
         test_inductive_indices = get_inductive_indices(relations, train_df, test_df)
 
-        new_val_df = val_df.loc[val_inductive_indices]
-        new_test_df = test_df.loc[test_inductive_indices]
+        new_val_df = val_df[val_df['com_id'].isin(val_inductive_indices)]
+        new_test_df = test_df[test_df['com_id'].isin(test_inductive_indices)]
         logger.info('\n[val] {}, pos labels: {}'.format(new_val_df.shape, new_val_df['label'].sum()))
         logger.info('[test] {}, pos labels: {}'.format(new_test_df.shape, new_test_df['label'].sum()))
 
@@ -258,6 +241,36 @@ def main(args):
         np.savez_compressed(os.path.join(out_dir, 'inductive_indices.npz'),
                             val=val_inductive_indices, test=test_inductive_indices)
         logger.info('total time: {:3f}s'.format(time.time() - start))
+
+
+def main(args):
+
+    # display settings
+    pd.set_option('display.width', 181)
+    pd.set_option('display.max_columns', 100)
+
+    # setup input directory
+    in_dir = os.path.join(args.data_dir, args.dataset, 'raw')
+
+    # read in data
+    df = pd.read_csv(os.path.join(in_dir, 'comments.csv'), nrows=args.nrows)
+    df['text'] = df['text'].fillna('')
+
+    # create logger
+    log_dir = os.path.join(args.log_dir, args.dataset, args.feature_type)
+    os.makedirs(log_dir, exist_ok=True)
+
+    logger_fp = os.path.join(log_dir, 'log.txt')
+    logger = util.get_logger(logger_fp)
+    logger.info('\n{}'.format(args))
+
+    # split data into folds
+    for fold, fold_df in zip(np.arange(args.folds), np.array_split(df, args.folds)):
+
+        # setup output directory
+        out_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(fold))
+
+        make_dataset(args, fold_df, fold, out_dir, logger)
 
     util.remove_logger(logger)
 
@@ -269,6 +282,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='youtube', help='dataset.')
 
+    parser.add_argument('--folds', type=int, default=10, help='number of train/val/test splits.')
     parser.add_argument('--val_frac', type=float, default=0.05, help='fraction of validation data.')
     parser.add_argument('--test_frac', type=float, default=0.15, help='fraction of test data.')
 

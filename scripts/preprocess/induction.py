@@ -6,8 +6,9 @@ import numpy as np
 
 
 def get_inductive_indices(relations, train_df, test_df):
-
-    # extract test messages that have a connection to the training set
+    """
+    Return test messages that have a connection to the training set.
+    """
     test_ids = set()
     for relation, rf in relations.items():
 
@@ -25,6 +26,8 @@ def get_inductive_indices(relations, train_df, test_df):
 
     # filter out messages with connections to training
     new_test_df = test_df[~test_df['com_id'].isin(test_ids)]
-    indices = np.int32(new_test_df.index)
+    # print(new_test_df)
+    indices = new_test_df['com_id'].to_numpy()
+    # indices = np.int32(new_test_df.index)
 
     return indices

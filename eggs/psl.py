@@ -1,6 +1,5 @@
 """
 This class handles inference using PSL.
-TODO: try optimizing with GPP instead.
 """
 import os
 import time
