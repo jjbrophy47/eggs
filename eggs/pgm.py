@@ -19,6 +19,7 @@ class PGM:
     def __init__(self,
                  relations,
                  pgm_type='psl',
+                 scoring='auc',
                  psl_learner='mle',
                  data_dir='data',
                  working_dir='.temp',
@@ -32,6 +33,7 @@ class PGM:
             Relations to use for relational modeling.
         pgm_type : str (default='psl') {'psl', 'mrf'}
             Type of PGM to use for joint inference.
+        scoring : str (default='auc') {'auc', 'ap'}
         data_dir : str (default='data')
             Dataset directory containing relational information.
         working_dir : str (default='.temp/')
@@ -41,6 +43,7 @@ class PGM:
         """
         self.relations = relations
         self.pgm_type = pgm_type
+        self.scoring = scoring
         self.psl_learner = psl_learner
         self.data_dir = data_dir
         self.working_dir = os.path.join(working_dir, str(uuid.uuid4()))
@@ -70,6 +73,7 @@ class PGM:
 
         elif self.pgm_type == 'mrf':
             pgm = MRF(relations=self.relations,
+                      scoring=self.scoring,
                       data_dir=self.data_dir,
                       working_dir=self.working_dir,
                       logger=self.logger)

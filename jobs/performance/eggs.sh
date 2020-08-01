@@ -15,6 +15,7 @@ sgl_method=$6
 sgl_stacks=$7
 pgm=$8
 fold=$9
+scoring=${10}
 
 if [ $dataset == 'youtube' ]; then
     relations=('user' 'text')
@@ -38,4 +39,5 @@ python3 experiments/scripts/performance.py \
   --sgl_method $sgl_method \
   --sgl_stacks $sgl_stacks \
   --pgm $pgm \
-  --fold $fold
+  --fold $fold \
+  --scoring $scoring

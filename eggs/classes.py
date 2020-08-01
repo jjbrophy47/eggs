@@ -25,6 +25,7 @@ class EGGSClassifier:
                  sgl_method=None,
                  sgl_stacks=2,
                  pgm=None,
+                 scoring='auc',
                  psl_learner='mle',
                  data_dir='data',
                  logger=None,
@@ -45,6 +46,8 @@ class EGGSClassifier:
             Number of stacks to use for SGL. Only relevant if sgl is not None.
         pgm : str (default='None') {'psl', 'mrf', 'None'}
             Probabilistic graphical model to use for joint inference.
+        scoring : str (default='auc') {'auc', 'ap'}
+            Tuning metric for the MRF.
         psl_learner : str (default='mle') {'mle', 'gpp'}
             Probabilistic graphical model to use for joint inference.
         data_dir : str (default='data')
@@ -59,6 +62,7 @@ class EGGSClassifier:
         self.sgl_method = sgl_method
         self.sgl_stacks = sgl_stacks
         self.pgm = pgm
+        self.scoring = scoring
         self.psl_learner = psl_learner
         self.data_dir = data_dir
         self.logger = logger
@@ -110,6 +114,7 @@ class EGGSClassifier:
             # train
             pgm = PGM(relations=self.relations,
                       pgm_type=self.pgm,
+                      scoring=self.scoring,
                       psl_learner=self.psl_learner,
                       data_dir=self.data_dir,
                       logger=self.logger)

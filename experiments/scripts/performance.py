@@ -40,6 +40,7 @@ def _get_model(args, data_dir, logger):
                                     sgl_method=args.sgl_method,
                                     sgl_stacks=args.sgl_stacks,
                                     pgm=args.pgm,
+                                    scoring=args.scoring,
                                     psl_learner=args.psl_learner,
                                     data_dir=data_dir,
                                     logger=logger,
@@ -54,6 +55,8 @@ def _get_model(args, data_dir, logger):
 def experiment(args, logger, out_dir):
 
     logger.info('\nDATA')
+    start = time.time()
+
     in_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(args.fold))
 
     # read in feature data
@@ -90,20 +93,25 @@ def experiment(args, logger, out_dir):
     logger.info('\ntrain instances: X: {}, y: {}'.format(X_train.shape, y_train.shape))
     logger.info('val   instances: X: {}, y: {}'.format(X_val.shape, y_val.shape))
     logger.info('test  instances: X: {}, y: {}'.format(X_test.shape, y_test.shape))
+    logger.info('total time: {:.3f}s'.format(time.time() - start))
+
+    # train
+    logger.info('\nTRAIN')
+    start = time.time()
 
     # setup models
     model = _get_model(args, data_dir=in_dir, logger=logger)
 
-    # train and predict
-    logger.info('\nTRAIN')
-    start = time.time()
     if args.eggs:
         model = model.fit(X_train, y_train, target_ids_train, X_val, y_val, target_ids_val)
     else:
         model = model.fit(X_train, y_train)
     logger.info('total time: {:.3f}s'.format(time.time() - start))
 
+    # predict
     logger.info('\nPREDICT')
+    start = time.time()
+
     if args.eggs:
         proba = model.predict_proba(X_test, target_ids_test)[:, 1]
     else:
@@ -175,6 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--sgl_method', type=str, default='None', help='training method.')
     parser.add_argument('--sgl_stacks', type=int, default=0, help='number of SGL stacks.')
     parser.add_argument('--pgm', type=str, default='None', help='joint inference model (MRF or PSL).')
+    parser.add_argument('--scoring', type=str, default='auc', help='tuning metric.')
     parser.add_argument('--psl_learner', type=str, default='mle', help='PSL weight learning.')
 
     # extra settings
