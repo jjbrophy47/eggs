@@ -2,9 +2,9 @@ dataset=$1
 nrows=$2
 val_frac=$3
 test_frac=$4
-cpu=$4
-time=$5
-partition=$6
+cpu=$5
+time=$6
+partition=$7
 
 sbatch --cpus-per-task=$cpu \
        --time=$time \
