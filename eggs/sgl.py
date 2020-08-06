@@ -113,7 +113,7 @@ class SGL:
         for i in range(self.stacks):
 
             if self.logger:
-                self.logger.info('\nStack {}'.format(i))
+                self.logger.info('\nStack {}'.format(i + 1))
 
             X = Xg if i == 0 else util.hstack([Xg, Xr])
 

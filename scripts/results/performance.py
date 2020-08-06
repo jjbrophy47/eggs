@@ -35,20 +35,21 @@ def _get_result(r, experiment_dir):
 
 def create_csv(args, logger):
 
-    experiment_settings = list(product(*[args.dataset, args.rs, args.base_estimator,
+    experiment_settings = list(product(*[args.dataset, args.fold, args.rs, args.base_estimator,
                                          args.feature_type, args.test_type,
                                          args.sgl_method, args.sgl_stacks, args.pgm]))
 
     results = []
     for experiment_tuple in tqdm(experiment_settings):
-        dataset, rs, base_estimator, feature_type, test_type, sgl_method, sgl_stacks, pgm = experiment_tuple
+        dataset, fold, rs, base_estimator, feature_type, test_type, sgl_method, sgl_stacks, pgm = experiment_tuple
 
-        result = {'dataset': dataset, 'rs': rs, 'base_estimator': base_estimator,
+        result = {'dataset': dataset, 'fold': fold, 'rs': rs, 'base_estimator': base_estimator,
                   'feature_type': feature_type, 'test_type': test_type,
                   'sgl_method': sgl_method, 'sgl_stacks': sgl_stacks, 'pgm': pgm}
 
         experiment_dir = os.path.join(args.in_dir,
                                       dataset,
+                                      'fold_{}'.format(fold),
                                       'rs_{}'.format(rs),
                                       'base_{}'.format(base_estimator),
                                       'feature_{}'.format(feature_type),
@@ -95,6 +96,7 @@ if __name__ == '__main__':
 
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+', default=['youtube', 'twitter', 'soundcloud'], help='data.')
+    parser.add_argument('--fold', type=str, nargs='+', default=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], help='folds.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1], help='random state.')
     parser.add_argument('--base_estimator', type=str, nargs='+', default=['lr', 'lgb'], help='baseline model.')
     parser.add_argument('--feature_type', type=str, nargs='+', default=['limited', 'full'], help='features to use.')

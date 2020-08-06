@@ -47,7 +47,6 @@ def _compute_features(args, logger, df, cv=None):
                    'num_uni', 'polarity', 'subjectivity']
 
     elif args.dataset == 'youtube':
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
         features_df['wday'] = df['timestamp'].dt.dayofweek
         features_df['hour'] = df['timestamp'].dt.hour
         content = ['num_chs', 'wday', 'hour', 'polarity', 'subjectivity']
@@ -253,6 +252,8 @@ def main(args):
     # read in data
     df = pd.read_csv(os.path.join(in_dir, 'comments.csv'), nrows=args.nrows)
     df['text'] = df['text'].fillna('')
+    if 'timestamp' in df.columns:
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     # create logger
     log_dir = os.path.join(args.log_dir, args.dataset, args.feature_type)

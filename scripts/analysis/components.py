@@ -66,8 +66,14 @@ def main(args):
 
     # filter out transductive test indices
     if args.test_type == 'inductive':
-        indices = np.load(os.path.join(in_dir, 'inductive_indices.npz'))
-        test_df = test_df[test_df['com_id'].isin(indices[args.eval_set])]
+        inductive_indices_list = []
+        for fold in args.folds:
+            indices = np.load(os.path.join(in_dir,
+                                           'fold_{}'.format(fold),
+                                           'inductive_indices.npz'))[args.eval_set]
+            inductive_indices_list.append(indices)
+        inductive_indices = np.concatenate(inductive_indices_list)
+        test_df = test_df[test_df['com_id'].isin(inductive_indices)]
 
     # extract label data
     y_test = test_df['label'].to_numpy()

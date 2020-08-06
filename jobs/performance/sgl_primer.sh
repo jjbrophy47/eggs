@@ -4,12 +4,12 @@ time=$3
 partition=$4
 
 rs=1
-fold_list=(0 1 2 3 4 5 6 7 8 9)
+fold_list=(0)
 feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')
 
-sgl_method_list=('holdout')
+sgl_method_list=('holdout', 'cv')
 sgl_stacks_list=(1 2)
 
 for fold in ${fold_list[@]}; do
@@ -25,7 +25,7 @@ for fold in ${fold_list[@]}; do
                        --job-name=EP_$dataset \
                        --output=jobs/logs/performance/$dataset \
                        --error=jobs/errors/performance/$dataset \
-                       jobs/performance/baseline.sh $dataset $rs \
+                       jobs/performance/baseline_runner.sh $dataset $rs \
                        $feature_type $test_type $base_estimator $fold
 
                 for sgl_method in ${sgl_method_list[@]}; do
@@ -38,7 +38,7 @@ for fold in ${fold_list[@]}; do
                                --job-name=EP_$dataset \
                                --output=jobs/logs/performance/$dataset \
                                --error=jobs/errors/performance/$dataset \
-                               jobs/performance/eggs.sh $dataset $rs \
+                               jobs/performance/eggs_runner.sh $dataset $rs \
                                $feature_type $test_type $base_estimator \
                                $sgl_method $sgl_stacks 'None' $fold 'auc'
                     done
