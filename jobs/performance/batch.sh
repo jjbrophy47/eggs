@@ -4,6 +4,6 @@
 ./jobs/performance/sgl_primer.sh soundcloud 2 1440 short
 
 # MRF and MRF + SGL
-./jobs/performance/mrf.sh youtube auc 3 4320 long
-./jobs/performance/mrf.sh twitter auc 3 4320 long
-./jobs/performance/mrf.sh soundcloud auc 3 4320 long
+./jobs/performance/mrf_primer.sh youtube auc 3 4320 long
+./jobs/performance/mrf_primer.sh twitter auc 3 4320 long
+./jobs/performance/mrf_primer.sh soundcloud auc 3 4320 long
