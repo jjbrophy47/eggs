@@ -22,7 +22,7 @@ for fold in ${fold_list[@]}; do
                 sbatch --cpus-per-task=$cpu \
                        --time=$time \
                        --partition=$partition \
-                       --job-name=EP_$dataset \
+                       --job-name=BASE_$dataset \
                        --output=jobs/logs/performance/$dataset \
                        --error=jobs/errors/performance/$dataset \
                        jobs/performance/baseline_runner.sh $dataset $rs \
@@ -35,7 +35,7 @@ for fold in ${fold_list[@]}; do
                         sbatch --cpus-per-task=$cpu \
                                --time=$time \
                                --partition=$partition \
-                               --job-name=EP_$dataset \
+                               --job-name=SGL_$dataset \
                                --output=jobs/logs/performance/$dataset \
                                --error=jobs/errors/performance/$dataset \
                                jobs/performance/eggs_runner.sh $dataset $rs \

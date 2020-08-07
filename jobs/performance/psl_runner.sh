@@ -23,20 +23,22 @@ fi
 feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')
-# base_estimator_list=('lr' 'lgb')
 
 sgl_method_list=('holdout')
-# sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
 psl_learner_list('mle')
+
+# base_estimator_list=('lr' 'lgb')
+# sgl_method_list=('holdout' 'cv')
 # psl_learner_list('mle' 'gpp')
 
 for feature_type in ${feature_type_list[@]}; do
     for test_type in ${test_type_list[@]}; do
-        for base_estimator in ${base_estimator_list[@]}; do
 
+        for base_estimator in ${base_estimator_list[@]}; do
             for psl_learner in ${psl_learner_list[@]}; do
 
+                # PSL only
                 python3 experiments/scripts/performance.py \
                   --append_results \
                   --eggs \
@@ -53,6 +55,7 @@ for feature_type in ${feature_type_list[@]}; do
                 for sgl_method in ${sgl_method_list[@]}; do
                     for sgl_stacks in ${sgl_stacks_list[@]}; do
 
+                        # SGL + PSL
                         python3 experiments/scripts/performance.py \
                           --append_results \
                           --eggs \
