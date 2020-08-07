@@ -16,4 +16,4 @@ sbatch --cpus-per-task=3 \
        --job-name=PSL_$dataset \
        --output=jobs/logs/performance/$dataset \
        --error=jobs/errors/performance/$dataset \
-       jobs/performance/baseline_runner.sh $dataset 1 0
+       jobs/performance/psl_runner.sh $dataset 1 0
