@@ -20,6 +20,8 @@ from relations import create_link_relation
 from relations import create_hashuser_relation
 from induction import get_inductive_indices
 
+MIN_POS = 10
+
 
 def _compute_features(args, logger, df, cv=None):
     """
@@ -181,7 +183,7 @@ def make_dataset(args, df, fold, out_dir, logger):
     train_df = df[:len(df) - n_test - n_val]
 
     # skip this fold, no positive samples
-    if val_df['label'].sum() == 0 or test_df['label'].sum() == 0:
+    if val_df['label'].sum() < MIN_POS or test_df['label'].sum() < MIN_POS:
         return -1
 
     # generate independent features
@@ -237,7 +239,7 @@ def make_dataset(args, df, fold, out_dir, logger):
         new_test_df = test_df[test_df['com_id'].isin(test_inductive_indices)]
 
         # skip this fold, no positive samples
-        if new_val_df['label'].sum() == 0 or new_test_df['label'].sum() == 0:
+        if new_val_df['label'].sum() < MIN_POS or new_test_df['label'].sum() < MIN_POS:
             return -1
 
         logger.info('\n[val] {}, pos labels: {}'.format(new_val_df.shape, new_val_df['label'].sum()))
@@ -282,7 +284,7 @@ def main(args):
 
     fold = 0
     for fold_df in np.array_split(df, n_folds):
-        logger.info('\n\nFold {}: {}'.format(fold, len(fold_df)))
+        logger.info('\n\nFold {}: {:,}'.format(fold, len(fold_df)))
 
         # setup output directory
         out_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(fold))
