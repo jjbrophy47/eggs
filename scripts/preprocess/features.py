@@ -170,7 +170,7 @@ def _generate_relations(args, train_df, val_df, test_df):
 
 def make_dataset(args, df, fold, out_dir, logger):
 
-    logger.info('\n\nFOLD {}'.format(fold))
+    # logger.info('\n\nFOLD {}'.format(fold))
 
     # split the data into train, val, and test
     n_val = int(len(df) * args.val_frac)
@@ -179,6 +179,10 @@ def make_dataset(args, df, fold, out_dir, logger):
     val_df = df[len(df) - n_test - n_val: len(df) - n_test]
     test_df = df[len(df) - n_test:]
     train_df = df[:len(df) - n_test - n_val]
+
+    # skip this fold, no positive samples
+    if val_df['label'].sum() == 0 or test_df['label'].sum() == 0:
+        return -1
 
     # generate independent features
     logger.info('\nTRAIN')
@@ -231,6 +235,11 @@ def make_dataset(args, df, fold, out_dir, logger):
 
         new_val_df = val_df[val_df['com_id'].isin(val_inductive_indices)]
         new_test_df = test_df[test_df['com_id'].isin(test_inductive_indices)]
+
+        # skip this fold, no positive samples
+        if new_val_df['label'].sum() == 0 or new_test_df['label'].sum() == 0:
+            return -1
+
         logger.info('\n[val] {}, pos labels: {}'.format(new_val_df.shape, new_val_df['label'].sum()))
         logger.info('[test] {}, pos labels: {}'.format(new_test_df.shape, new_test_df['label'].sum()))
 
@@ -264,13 +273,25 @@ def main(args):
     logger.info('\n{}'.format(args))
 
     # split data into folds
-    for fold, fold_df in zip(np.arange(args.folds), np.array_split(df, args.folds)):
+    if args.n_folds == -1:
+        n_folds = int(len(df) / args.n_fold_samples)
+    else:
+        n_folds = args.n_folds
+
+    logger.info('\nno. folds: {:,}'.format(n_folds))
+
+    fold = 0
+    for fold_df in np.array_split(df, n_folds):
+        logger.info('\n\nFold {}: {}'.format(fold, len(fold_df)))
 
         # setup output directory
         out_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(fold))
+        result = make_dataset(args, fold_df, fold, out_dir, logger)
 
-        make_dataset(args, fold_df, fold, out_dir, logger)
+        if result != -1:
+            fold += 1
 
+    logger.info('total no. valid folds: {}'.format(fold))
     util.remove_logger(logger)
 
 
@@ -281,8 +302,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='youtube', help='dataset.')
 
-    parser.add_argument('--folds', type=int, default=10, help='number of train/val/test splits.')
-    parser.add_argument('--val_frac', type=float, default=0.05, help='fraction of validation data.')
+    parser.add_argument('--n_fold_samples', type=int, default=100000, help='number of samples in a fold.')
+    parser.add_argument('--n_folds', type=int, default=-1, help='number of train/val/test splits.')
+
+    parser.add_argument('--val_frac', type=float, default=0.15, help='fraction of validation data.')
     parser.add_argument('--test_frac', type=float, default=0.15, help='fraction of test data.')
 
     parser.add_argument('--feature_type', type=str, default='limited', help='limited or full.')
