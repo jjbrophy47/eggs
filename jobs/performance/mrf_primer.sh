@@ -1,11 +1,12 @@
 dataset=$1
 scoring=$2
-cpu=$3
-time=$4
-partition=$5
+n_folds=$3
+cpu=$4
+time=$5
+partition=$6
 
 rs=1
-fold_list=(0)
+# fold_list=(0)
 feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')
@@ -14,7 +15,8 @@ sgl_method_list=('holdout', 'cv')
 sgl_stacks_list=(1 2)
 pgm_list=('mrf')
 
-for fold in ${fold_list[@]}; do
+# for fold in ${fold_list[@]}; do
+for fold in $(seq 0 $n_folds); do
 
     for feature_type in ${feature_type_list[@]}; do
         for test_type in ${test_type_list[@]}; do
