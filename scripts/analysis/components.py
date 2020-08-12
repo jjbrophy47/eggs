@@ -98,6 +98,10 @@ def analyze_components(args, test_df, in_dir, fold, logger):
     result_df = pd.DataFrame(results)
     logger.info(result_df)
 
+    if len(result_df) == 0:
+        logger.info('NO connected components!')
+        return None
+
     # global statistics
     logger.info('\nANALYSIS')
 
@@ -151,12 +155,15 @@ def main(args):
     # concatenate target data from each fold
     df_list = []
     for fold in range(args.n_folds):
+        logger.info('\nFOLD {}'.format(fold))
         fp = os.path.join(in_dir,
                           'fold_{}'.format(fold),
                           'y_{}.csv'.format(args.eval_set))
         df = pd.read_csv(fp)
         result_df = analyze_components(args, df, in_dir, fold, logger)
-        df_list.append(result_df)
+
+        if result_df:
+            df_list.append(result_df)
 
     results_df = pd.concat(df_list)
 
