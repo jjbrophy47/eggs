@@ -162,7 +162,7 @@ def main(args):
         df = pd.read_csv(fp)
         result_df = analyze_components(args, df, in_dir, fold, logger)
 
-        if result_df:
+        if result_df is not None:
             df_list.append(result_df)
 
     results_df = pd.concat(df_list)
