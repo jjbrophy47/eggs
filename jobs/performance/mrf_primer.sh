@@ -6,7 +6,6 @@ time=$5
 partition=$6
 
 rs=1
-# fold_list=(0)
 feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')

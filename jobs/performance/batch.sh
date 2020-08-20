@@ -4,9 +4,9 @@
 # ./jobs/performance/sgl_primer.sh soundcloud 185 1 1440 short
 
 # MRF and SGL + MRF
-./jobs/performance/mrf_primer.sh youtube auc 3 32 4320 long
-# ./jobs/performance/mrf_primer.sh twitter auc 3 44 4320 long
-# ./jobs/performance/mrf_primer.sh soundcloud auc 3 185 4320 long
+./jobs/performance/mrf_primer.sh youtube auc 32 3 4320 long
+# ./jobs/performance/mrf_primer.sh twitter auc 44 3 4320 long
+# ./jobs/performance/mrf_primer.sh soundcloud auc 185 3 4320 long
 
 # PSL and SGL + PSL - must be run sequentially
 # dataset='youtube'
