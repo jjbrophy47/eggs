@@ -1,12 +1,12 @@
 # baseline and SGL
-./jobs/performance/sgl_primer.sh youtube 64 1 1440 short
-./jobs/performance/sgl_primer.sh twitter 88 1 1440 short
-./jobs/performance/sgl_primer.sh soundcloud 331 1 1440 short
+./jobs/performance/sgl_primer.sh youtube 32 1 1440 short
+# ./jobs/performance/sgl_primer.sh twitter 44 1 1440 short
+# ./jobs/performance/sgl_primer.sh soundcloud 185 1 1440 short
 
 # MRF and SGL + MRF
-./jobs/performance/mrf_primer.sh youtube auc 3 64 4320 long
-./jobs/performance/mrf_primer.sh twitter auc 3 88 4320 long
-./jobs/performance/mrf_primer.sh soundcloud auc 3 331 4320 long
+./jobs/performance/mrf_primer.sh youtube auc 3 32 4320 long
+# ./jobs/performance/mrf_primer.sh twitter auc 3 44 4320 long
+# ./jobs/performance/mrf_primer.sh soundcloud auc 3 185 4320 long
 
 # PSL and SGL + PSL - must be run sequentially
 # dataset='youtube'
