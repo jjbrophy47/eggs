@@ -9,7 +9,7 @@ feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')
 
-sgl_method_list=('holdout', 'cv')
+sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
 
 for fold in $(seq 0 $n_folds); do

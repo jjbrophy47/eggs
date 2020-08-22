@@ -152,7 +152,7 @@ def main(args):
     logger.info('\nDATA')
     in_dir = os.path.join(args.data_dir, args.dataset)
 
-    # concatenate target data from each fold
+    # analyze each fold separately and then combine results
     df_list = []
     for fold in range(args.n_folds):
         logger.info('\nFOLD {}'.format(fold))
