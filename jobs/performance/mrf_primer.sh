@@ -1,7 +1,7 @@
 dataset=$1
 scoring=$2
 n_folds=$3
-cpu=$4
+mem=$4
 time=$5
 partition=$6
 
@@ -14,7 +14,6 @@ sgl_method_list=('holdout' 'cv')
 sgl_stacks_list=(1 2)
 pgm_list=('mrf')
 
-# for fold in ${fold_list[@]}; do
 for fold in $(seq 0 $n_folds); do
 
     for feature_type in ${feature_type_list[@]}; do
@@ -24,7 +23,7 @@ for fold in $(seq 0 $n_folds); do
                 for pgm in ${pgm_list[@]}; do
 
                     # PGM only
-                    sbatch --cpus-per-task=$cpu \
+                    sbatch --mem=${cpu}G \
                            --time=$time \
                            --partition=$partition \
                            --job-name=MRF_$dataset \
@@ -40,7 +39,7 @@ for fold in $(seq 0 $n_folds); do
                         for pgm in ${pgm_list[@]}; do
 
                             # SGL + PGM
-                            sbatch --cpus-per-task=$cpu \
+                            sbatch --mem=${cpu}G \
                                    --time=$time \
                                    --partition=$partition \
                                    --job-name=MRF_$dataset \

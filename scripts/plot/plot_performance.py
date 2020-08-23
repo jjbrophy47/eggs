@@ -109,8 +109,6 @@ def main(args):
     main_fp = os.path.join(args.in_dir, 'results.csv')
     main_df = pd.read_csv(main_fp)
 
-    print(main_df)
-
     for i, (feature_type, test_type) in enumerate(settings):
         ax = axs[i]
 
@@ -125,9 +123,14 @@ def main(args):
                     color=colors, ax=axs[i], edgecolor='k', linewidth=0.5, capsize=2)
 
         bars = ax.patches
-
-        for bar, hatch in zip(bars, hatches):
-            bar.set_hatch(hatch)
+        hatch_cnt = 0
+        hatch_ndx = -1
+        for j in range(len(bars)):
+            if hatch_cnt == n_datasets:
+                hatch_ndx += 1
+                hatch_cnt = 0
+            bars[j].set_hatch(hatches[hatch_ndx])
+            hatch_cnt += 1
 
         test_label = 'Inductive + Transductive' if test_type == 'full' else 'Inductive'
         ax.set_title('Feature: {}, Test samples: {}'.format(feature_type.capitalize(), test_label), loc='left')
