@@ -23,7 +23,7 @@ for fold in $(seq 0 $n_folds); do
                 for pgm in ${pgm_list[@]}; do
 
                     # PGM only
-                    sbatch --mem=${cpu}G \
+                    sbatch --mem=${mem}G \
                            --time=$time \
                            --partition=$partition \
                            --job-name=MRF_$dataset \
@@ -39,7 +39,7 @@ for fold in $(seq 0 $n_folds); do
                         for pgm in ${pgm_list[@]}; do
 
                             # SGL + PGM
-                            sbatch --mem=${cpu}G \
+                            sbatch --mem=${mem}G \
                                    --time=$time \
                                    --partition=$partition \
                                    --job-name=MRF_$dataset \
