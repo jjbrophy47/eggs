@@ -20,7 +20,7 @@ from relations import create_link_relation
 from relations import create_hashuser_relation
 from induction import get_inductive_indices
 
-MIN_POS = 10
+MIN_POS = 2
 
 
 def _compute_features(args, logger, df, cv=None):
@@ -182,6 +182,8 @@ def make_dataset(args, df, fold, out_dir, logger):
     test_df = df[len(df) - n_test:]
     train_df = df[:len(df) - n_test - n_val]
 
+    print(train_df.shape, val_df.shape, val_df['label'].sum(), test_df.shape, test_df['label'].sum())
+
     # skip this fold, no positive samples
     if val_df['label'].sum() < MIN_POS or test_df['label'].sum() < MIN_POS:
         return -1
@@ -275,23 +277,20 @@ def main(args):
     logger.info('\n{}'.format(args))
 
     # split data into folds
-    if args.n_folds == -1:
-        n_folds = int(len(df) / args.n_fold_samples)
-    else:
-        n_folds = args.n_folds
-
-    logger.info('\nno. folds: {:,}'.format(n_folds))
+    logger.info('\nno. folds: {:,}'.format(args.n_folds))
 
     fold = 0
-    for fold_df in np.array_split(df, n_folds):
+    for fold_df in np.array_split(df, args.n_folds):
         logger.info('\n\nFold {}: {:,}'.format(fold, len(fold_df)))
 
         # setup output directory
         out_dir = os.path.join(args.data_dir, args.dataset, 'fold_{}'.format(fold))
         result = make_dataset(args, fold_df, fold, out_dir, logger)
 
-        if result != -1:
-            fold += 1
+        if result == -1:
+            exit('Not enough positive samples!')
+
+        fold += 1
 
     logger.info('total no. valid folds: {}'.format(fold))
     util.remove_logger(logger)
@@ -304,11 +303,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='youtube', help='dataset.')
 
-    parser.add_argument('--n_fold_samples', type=int, default=100000, help='number of samples in a fold.')
-    parser.add_argument('--n_folds', type=int, default=-1, help='number of train/val/test splits.')
+    parser.add_argument('--n_folds', type=int, default=10, help='number of train/val/test splits.')
 
-    parser.add_argument('--val_frac', type=float, default=0.15, help='fraction of validation data.')
-    parser.add_argument('--test_frac', type=float, default=0.15, help='fraction of test data.')
+    parser.add_argument('--val_frac', type=float, default=0.025, help='fraction of validation data.')
+    parser.add_argument('--test_frac', type=float, default=0.285, help='fraction of test data.')
 
     parser.add_argument('--feature_type', type=str, default='limited', help='limited or full.')
     parser.add_argument('--relations', action='store_true', default=False, help='create relational features.')

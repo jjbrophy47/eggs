@@ -10,7 +10,11 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 from sklearn.utils.validation import check_is_fitted
 
+from . import connections
 from . import util
+
+
+MAX_CLUSTER_SIZE = 40000
 
 
 class MRF:
@@ -90,16 +94,15 @@ class MRF:
             # test different epsilon values for this relation
             scores = []
             for epsilon in self.epsilon:
-                targets_dict, relation_dict_list = self._create_mrf(target_priors=target_priors,
-                                                                    relations_dict=relation_dict,
-                                                                    epsilon=epsilon,
-                                                                    target_col=target_col)
-                y_score = self._inference(targets_dict, relation_dict_list)[:, 1]
-                metric_score = self.scoring_(y, y_score)
+
+                # run inference over subgraph clusters
+                y_score = self._group_inference(target_priors, relation_dict, epsilon, target_col)
+
+                metric_score = self.scoring_(y, y_score[:, 1])
                 scores.append((metric_score, epsilon))
 
                 if self.logger:
-                    s = '[MRF]: epsilon={}, {}={:.3f}, time={:.3f}s'
+                    s = '\n[MRF]: epsilon={}, {}={:.3f}, time={:.3f}s'
                     self.logger.info(s.format(epsilon, self.scoring, metric_score, time.time() - start))
 
             self.relation_epsilons_[relation_id] = sorted(scores, reverse=True)[0][1]
@@ -117,23 +120,67 @@ class MRF:
         """
         check_is_fitted(self, 'relation_epsilons_')
 
-        result = util.get_relational_entities(y_hat=y_hat,
-                                              target_ids=target_ids,
-                                              relations=self.relations,
-                                              data_dir=self.data_dir,
-                                              logger=self.logger)
-        target_priors, relations_dict, target_col = result
+        target_priors, relations_dict, target_col = util.get_relational_entities(y_hat=y_hat,
+                                                                                 target_ids=target_ids,
+                                                                                 relations=self.relations,
+                                                                                 data_dir=self.data_dir,
+                                                                                 logger=self.logger)
 
-        targets_dict, relation_dict_list = self._create_mrf(target_priors=target_priors,
-                                                            relations_dict=relations_dict,
-                                                            target_col=target_col)
-
-        y_score = self._inference(targets_dict, relation_dict_list)
+        y_score = self._group_inference(target_priors, relations_dict, target_col=target_col)
 
         return y_score
 
     # private
-    def _inference(self, targets_dict, relation_dicts):
+    def _group_inference(self, target_priors, relations_dict, epsilon=None, target_col='com_id',
+                         max_size=7500, max_edges=40000):
+        """
+        Run inference over clusters of connected components to reduce
+        memory and runtime.
+        """
+        result_df = pd.DataFrame(target_priors, columns=[target_col, 'ind_yhat'])
+
+        clusters = connections.create_clusters(target_priors, relations_dict,
+                                               max_size=MAX_CLUSTER_SIZE)
+
+        # Run inference over each cluster
+        results = []
+        for i, (msg_nodes, hub_nodes, relations, n_edges) in enumerate(clusters):
+
+            if self.logger:
+                s = '[CLUSTER {}] msgs: {}, hubs: {}, edges: {}'
+                self.logger.info(s.format(i, len(msg_nodes), len(hub_nodes), n_edges))
+
+            # filter target IDs
+            cluster_target_ids = [int(x.split('-')[1]) for x in msg_nodes]
+            temp_df = result_df[result_df[target_col].isin(cluster_target_ids)]
+            cluster_target_priors = list(zip(temp_df[target_col], temp_df['ind_yhat']))
+
+            # create libra files for this cluster
+            targets_dict, relation_dict_list = self._create_mrf(target_priors=cluster_target_priors,
+                                                                relations_dict=relations_dict,
+                                                                target_col=target_col,
+                                                                epsilon=epsilon)
+
+            # run inference for this cluster and save the results
+            y_score = self._libra_inference(targets_dict, relation_dict_list)[:, 1]
+            yhat_df = pd.DataFrame(zip(targets_dict.keys(), y_score), columns=[target_col, 'pgm_yhat'])
+            results.append(yhat_df)
+
+        # put updated scores in order of target IDs
+        yhat_df = pd.concat(results)
+        result_df = result_df.merge(yhat_df, on=target_col, how='left')
+
+        # fill independent target ID nodes with independent predictions
+        result_df['pgm_yhat'] = result_df['pgm_yhat'].fillna(result_df['ind_yhat'])
+
+        # put scores into sklearn format
+        result_df['pgm_yhat_neg'] = 1 - result_df['pgm_yhat']
+        y_score = np.hstack([result_df['pgm_yhat_neg'].values.reshape(-1, 1),
+                             result_df['pgm_yhat'].values.reshape(-1, 1)])
+
+        return y_score
+
+    def _libra_inference(self, targets_dict, relation_dicts):
         """
         Loopy belief propagation using Libra.
         """

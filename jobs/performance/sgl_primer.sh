@@ -1,6 +1,6 @@
 dataset=$1
 n_folds=$2
-cpu=$3
+mem=$3
 time=$4
 partition=$5
 
@@ -19,7 +19,7 @@ for fold in $(seq 0 $n_folds); do
             for base_estimator in ${base_estimator_list[@]}; do
 
                 # baseline
-                sbatch --cpus-per-task=$cpu \
+                sbatch --mem=${mem}G \
                        --time=$time \
                        --partition=$partition \
                        --job-name=BASE_$dataset \
@@ -32,7 +32,7 @@ for fold in $(seq 0 $n_folds); do
                     for sgl_stacks in ${sgl_stacks_list[@]}; do
 
                         # SGL only
-                        sbatch --cpus-per-task=$cpu \
+                        sbatch --mem=${mem}G \
                                --time=$time \
                                --partition=$partition \
                                --job-name=SGL_$dataset \

@@ -14,7 +14,7 @@ from scipy import sparse
 
 def get_relational_entities(y_hat, target_ids, relations, data_dir='', logger=None):
     """
-    Generates pseudo-relational features using given predictions and relations.
+    Get relational information from each relation.
     """
 
     # classification nodes
@@ -35,7 +35,7 @@ def get_relational_entities(y_hat, target_ids, relations, data_dir='', logger=No
 
         # filter out connections not in the target_ids list
         df = df[df[target_col].isin(target_ids)]
-        connections = list(zip(df[relation_id], df[target_col]))
+        connections = list(zip(df[relation_id].astype(int), df[target_col]))
         relations_dict[relation_id] = connections
 
     return target_priors, relations_dict, target_col

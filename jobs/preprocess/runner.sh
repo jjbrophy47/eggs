@@ -5,21 +5,18 @@
 module load python3/3.7.5
 
 dataset=$1
-n_fold_samples=$2
-val_frac=$3
-test_frac=$4
+val_frac=$2
+test_frac=$3
 
 python3 scripts/preprocess/features.py \
   --dataset $dataset \
   --feature_type 'limited' \
   --relations \
-  --n_fold_samples $n_fold_samples \
   --val_frac $val_frac \
   --test_frac $test_frac
 
 python3 scripts/preprocess/features.py \
   --dataset $dataset \
   --feature_type 'full' \
-  --n_fold_samples $n_fold_samples \
   --val_frac $val_frac \
   --test_frac $test_frac
