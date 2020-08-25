@@ -8,6 +8,8 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import average_precision_score
 from scipy.stats import sem
 from tqdm import tqdm
 
@@ -30,6 +32,9 @@ def _get_result(r, experiment_dir):
 
         result['auc'] = d['auc']
         result['ap'] = d['ap']
+        result['target_id'] = d['target_id']
+        result['label'] = d['label']
+        result['yhat'] = d['yhat']
 
     return result
 
@@ -79,6 +84,18 @@ def process_results(df):
             result['ap_diff_mean'] = gf['ap_diff'].mean()
             result['auc_diff_std'] = sem(gf['auc_diff'])
             result['ap_diff_std'] = sem(gf['ap_diff'])
+
+            # concatenate folds and compute scores
+            label_list = []
+            yhat_list = []
+            for row in gf.itertuples(index=False):
+                label_list.append(row.label)
+                yhat_list.append(row.yhat)
+            label = np.concatenate(label_list)
+            yhat = np.concatenate(yhat_list)
+            result['auc'] = roc_auc_score(label, yhat)
+            result['ap'] = average_precision_score(label, yhat)
+
             result['dataset'] = dataset
             results.append(result)
 
@@ -118,10 +135,10 @@ def create_csv(args, logger):
         if not os.path.exists(experiment_dir):
             continue
 
-        cedar_result = _get_result(result, experiment_dir)
+        result = _get_result(result, experiment_dir)
 
-        if cedar_result:
-            results.append(cedar_result)
+        if result:
+            results.append(result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
@@ -156,7 +173,7 @@ if __name__ == '__main__':
 
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+', default=['youtube', 'twitter', 'soundcloud'], help='data.')
-    parser.add_argument('--fold', type=str, nargs='+', default=list(range(185)), help='folds.')
+    parser.add_argument('--fold', type=str, nargs='+', default=list(range(10)), help='folds.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1], help='random state.')
     parser.add_argument('--base_estimator', type=str, nargs='+', default=['lr', 'lgb'], help='baseline model.')
     parser.add_argument('--feature_type', type=str, nargs='+', default=['limited', 'full'], help='features to use.')

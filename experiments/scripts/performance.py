@@ -116,11 +116,15 @@ def experiment(args, logger, out_dir):
         proba = model.predict_proba(X_test, target_ids_test)[:, 1]
     else:
         proba = model.predict_proba(X_test)[:, 1]
+
     auc, ap = util.performance(y_test, proba, logger=logger, name='model')
     logger.info('total time: {:.3f}s'.format(time.time() - start))
 
     # save results
     result = {'auc': auc, 'ap': ap}
+    result['target_id'] = target_ids_test
+    result['label'] = y_test
+    result['yhat'] = proba
     np.save(os.path.join(out_dir, 'result.npy'), result)
 
 
