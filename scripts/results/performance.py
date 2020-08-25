@@ -52,7 +52,7 @@ def process_results(df):
 
         # compute performance difference from baseline
         fold_list = []
-        for tup, gf in temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator']):
+        for tup, gf in tqdm(temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator'])):
             base_df = gf[gf['sgl_method'] == 'None']
             base_df = gf[gf['sgl_stacks'] == 0]
             base_df = gf[gf['pgm'] == 'None']
@@ -73,7 +73,7 @@ def process_results(df):
                     'sgl_method', 'sgl_stacks', 'pgm']
 
         results = []
-        for tup, gf in temp_df.groupby(settings):
+        for tup, gf in tqdm(temp_df.groupby(settings)):
             result = {k: v for k, v in zip(settings, tup)}
             result['auc_mean'] = gf['auc'].mean()
             result['ap_mean'] = gf['ap'].mean()

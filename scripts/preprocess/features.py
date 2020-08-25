@@ -172,8 +172,6 @@ def _generate_relations(args, train_df, val_df, test_df):
 
 def make_dataset(args, df, fold, out_dir, logger):
 
-    # logger.info('\n\nFOLD {}'.format(fold))
-
     # split the data into train, val, and test
     n_val = int(len(df) * args.val_frac)
     n_test = int(len(df) * args.test_frac)
