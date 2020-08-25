@@ -145,10 +145,7 @@ class MRF:
         # Run inference over each cluster
         results = []
         for i, (msg_nodes, hub_nodes, relations, n_edges) in enumerate(clusters):
-
-            if self.logger:
-                s = '[CLUSTER {}] msgs: {}, hubs: {}, edges: {}'
-                self.logger.info(s.format(i, len(msg_nodes), len(hub_nodes), n_edges))
+            start = time.time()
 
             # filter target IDs
             cluster_target_ids = [int(x.split('-')[1]) for x in msg_nodes]
@@ -165,6 +162,11 @@ class MRF:
             y_score = self._libra_inference(targets_dict, relation_dict_list)[:, 1]
             yhat_df = pd.DataFrame(zip(targets_dict.keys(), y_score), columns=[target_col, 'pgm_yhat'])
             results.append(yhat_df)
+
+            if self.logger:
+                s = '[CLUSTER {} / {}] msgs: {}, hubs: {}, edges: {}, time: {:.3f}s'
+                self.logger.info(s.format(i, len(clusters), len(msg_nodes),
+                                 len(hub_nodes), n_edges, time.time() - start))
 
         # put updated scores in order of target IDs
         yhat_df = pd.concat(results)
