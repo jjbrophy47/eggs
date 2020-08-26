@@ -15,6 +15,7 @@ from . import util
 
 
 MAX_CLUSTER_SIZE = 40000
+MAX_EDGES = 40000
 
 
 class MRF:
@@ -140,7 +141,8 @@ class MRF:
         result_df = pd.DataFrame(target_priors, columns=[target_col, 'ind_yhat'])
 
         clusters = connections.create_clusters(target_priors, relations_dict,
-                                               max_size=MAX_CLUSTER_SIZE)
+                                               max_size=MAX_CLUSTER_SIZE,
+                                               max_edges=MAX_EDGES, logger=self.logger)
 
         # Run inference over each cluster
         results = []
@@ -165,7 +167,7 @@ class MRF:
 
             if self.logger:
                 s = '[CLUSTER {} / {}] msgs: {}, hubs: {}, edges: {}, time: {:.3f}s'
-                self.logger.info(s.format(i, len(clusters), len(msg_nodes),
+                self.logger.info(s.format(i + 1, len(clusters), len(msg_nodes),
                                  len(hub_nodes), n_edges, time.time() - start))
 
         # put updated scores in order of target IDs

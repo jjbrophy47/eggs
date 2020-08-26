@@ -39,7 +39,7 @@ def _get_result(r, experiment_dir):
     return result
 
 
-def process_results(df):
+def process_results(df, logger):
     """
     Compute performance differences and average among all folds.
     """
@@ -50,9 +50,11 @@ def process_results(df):
         if len(temp_df) == 0:
             continue
 
+        logger.info('\nProcessing {}'.format(dataset))
+
         # compute performance difference from baseline
         fold_list = []
-        for tup, gf in tqdm(temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator'])):
+        for tup, gf in temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator']):
             base_df = gf[gf['sgl_method'] == 'None']
             base_df = gf[gf['sgl_stacks'] == 0]
             base_df = gf[gf['pgm'] == 'None']
@@ -146,7 +148,7 @@ def create_csv(args, logger):
     df = pd.DataFrame(results)
     logger.info('\nRaw:\n{}'.format(df))
 
-    res_df = process_results(df)
+    res_df = process_results(df, logger=logger)
     logger.info('\nProcessed:\n{}'.format(res_df))
 
     fp = os.path.join(args.out_dir, 'results.csv')

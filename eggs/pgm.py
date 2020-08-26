@@ -54,6 +54,12 @@ class PGM:
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
+    def __del__(self):
+        """
+        Clean up any temporary directories.
+        """
+        shutil.rmtree(self.working_dir)
+
     def fit(self, y, y_hat, target_col):
         """
         Trains a PGM model.

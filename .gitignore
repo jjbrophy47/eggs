@@ -18,6 +18,7 @@ experiments/notebooks/.*
 
 .temp
 
+temp*
 temp_performance
 temp_analysis
 save_performance

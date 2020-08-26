@@ -17,8 +17,12 @@ def create_clusters(target_priors, relations_dict, target_col='com_id',
 
     graph, components = _build_networkx_graph(prior_df, relations_dict, target_col=target_col, logger=logger)
 
+    print(len(components))
+
     if max_edges > 0:
-        components = _partition_large_components(components, graph, max_edges)
+        components = _partition_large_components(components, graph, max_edges,
+                                                 target_col=target_col, logger=logger)
+        print(len(components))
 
     components = _process_components(components, graph, target_col=target_col, logger=logger)
     components = _filter_redundant_components(prior_df, components, target_col=target_col, logger=logger)
@@ -51,22 +55,26 @@ def _build_networkx_graph(prior_df, relations_dict, target_col='com_id', logger=
     return graph, components
 
 
-def _partition_large_components(components, g, max_edges=40000, logger=None):
+def _partition_large_components(components, graph, max_edges,
+                                target_col='com_id', logger=None):
+    """
+    Break up extremely large connected components to make inference more tractable.
+    """
     if logger:
         logger.info('partitioning very large subgraphs...')
 
     new_components = []
     for component in components:
-        hub_nodes = {x for x in component if '-' in str(x)}
-        num_edges = sum([g.degree(x) for x in hub_nodes])
+        hub_nodes = {node for node in component if target_col not in str(node)}
+        num_edges = sum([graph.degree(x) for x in hub_nodes])
 
         if num_edges >= max_edges:
             new_component = set()
             new_edges = 0
 
             for hub_node in hub_nodes:
-                hub_edges = g.degree(hub_node)
-                neighbors = set(g.neighbors(hub_node))
+                hub_edges = graph.degree(hub_node)
+                neighbors = set(graph.neighbors(hub_node))
 
                 # keep adding
                 if hub_edges + new_edges <= max_edges:
@@ -83,7 +91,7 @@ def _partition_large_components(components, g, max_edges=40000, logger=None):
                         new_component.update(neighbors)
                         new_edges = hub_edges
 
-                    # flush, then start anew
+                    # flush, then start new component
                     else:
                         new_components.append(new_component)
                         new_component = {hub_node}

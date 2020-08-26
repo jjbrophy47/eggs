@@ -49,24 +49,36 @@ def organize_results(args, df, feature_type, test_type, methods):
         method_list = []
         n_datasets += 1
 
+        base_df = temp2[temp2['sgl_method'] == 'None']
+        base_df = base_df[base_df['sgl_stacks'] == 0]
+        base_df = base_df[base_df['pgm'] == 'None']
+
+        result['baseline'] = 1 - base_df[args.metric].values[0]
+        method_list.append('baseline')
+
         # add methods
         for sgl_method, sgl_stacks, pgm in methods:
             temp3 = temp2[temp2['sgl_method'] == sgl_method]
             temp3 = temp3[temp3['sgl_stacks'] == sgl_stacks]
             temp3 = temp3[temp3['pgm'] == pgm]
 
-            key = '{}_{}_{}'.format(sgl_method, sgl_stacks, pgm)
-            metric_diff = temp3['{}_diff_mean'.format(args.metric)].values[0]
-            metric_std = temp3['{}_diff_std'.format(args.metric)].values[0]
+            if len(temp3) == 0:
+                continue
 
-            result[key] = metric_diff * 100
-            dataset_std_list.append(metric_std * 100)
+            key = '{}_{}_{}'.format(sgl_method, sgl_stacks, pgm)
+
+            # value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
+            value = 1 - temp3[args.metric].values[0]
+
+            result[key] = value
             method_list.append(key)
 
         std_list += dataset_std_list + dataset_std_list
 
         results.append(result)
     res_df = pd.DataFrame(results)
+
+    print(res_df)
 
     return res_df, method_list, std_list, n_datasets
 
@@ -109,6 +121,8 @@ def main(args):
     main_fp = os.path.join(args.in_dir, 'results.csv')
     main_df = pd.read_csv(main_fp)
 
+    print(main_df[main_df['dataset'] == 'twitter'])
+
     for i, (feature_type, test_type) in enumerate(settings):
         ax = axs[i]
 
@@ -117,9 +131,9 @@ def main(args):
                                                               test_type=test_type,
                                                               methods=methods)
 
-        yerr = np.reshape(std_list, (len(methods), 2, n_datasets), order='F')
+        # yerr = np.reshape(std_list, (len(methods), 2, n_datasets), order='F')
 
-        res_df.plot(x='dataset', y=keys, yerr=yerr, kind='bar', hatch=hatches,
+        res_df.plot(x='dataset', y=keys, kind='bar', hatch=hatches,
                     color=colors, ax=axs[i], edgecolor='k', linewidth=0.5, capsize=2)
 
         bars = ax.patches
