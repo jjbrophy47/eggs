@@ -3,6 +3,7 @@ Module that puts all connected components into separate groups.
 """
 import pandas as pd
 import networkx as nx
+from tqdm import tqdm
 
 
 # public
@@ -44,9 +45,11 @@ def _build_networkx_graph(prior_df, relations_dict, target_col='com_id', logger=
     graph = nx.Graph()
 
     # create edges from target nodes to hub nodes
-    for relation_col, connection_list in relations_dict.items():
+    for i, (relation_col, connection_list) in enumerate(relations_dict.items()):
+        if logger:
+            logger.info('[CONNECTION {} / {}]'.format(i, len(relations_dict.items())))
 
-        for hub_id, target_id in connection_list:
+        for hub_id, target_id in tqdm(connection_list):
             if target_id in prior_df[target_col].unique():
                 graph.add_edge('{}-{}'.format(target_col, target_id), '{}-{}'.format(relation_col, hub_id))
 

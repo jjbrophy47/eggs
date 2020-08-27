@@ -8,7 +8,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../')
 sys.path.insert(0, here + '/../../')
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -53,8 +52,8 @@ def organize_results(args, df, feature_type, test_type, methods):
         base_df = base_df[base_df['sgl_stacks'] == 0]
         base_df = base_df[base_df['pgm'] == 'None']
 
-        result['baseline'] = 1 - base_df[args.metric].values[0]
-        method_list.append('baseline')
+        # result['baseline'] = 1 - base_df[args.metric].values[0]
+        # method_list.append('baseline')
 
         # add methods
         for sgl_method, sgl_stacks, pgm in methods:
@@ -67,8 +66,8 @@ def organize_results(args, df, feature_type, test_type, methods):
 
             key = '{}_{}_{}'.format(sgl_method, sgl_stacks, pgm)
 
-            # value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
-            value = 1 - temp3[args.metric].values[0]
+            value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
+            # value = 1 - temp3[args.metric].values[0]
 
             result[key] = value
             method_list.append(key)
@@ -172,7 +171,7 @@ def main(args):
     os.makedirs(out_dir, exist_ok=True)
 
     fig.tight_layout()
-    fp = os.path.join(out_dir, 'peformance_{}.pdf'.format(args.metric))
+    fp = os.path.join(out_dir, 'performance_{}.pdf'.format(args.metric))
     plt.savefig(fp)
     plt.show()
 

@@ -12,8 +12,12 @@ from pslpython.predicate import Predicate
 from pslpython.rule import Rule
 
 from . import util
+from . import connections
 
 JVM_OPTIONS = ['-Xmx60g']
+
+MAX_CLUSTER_SIZE = 40000
+MAX_EDGES = 40000
 
 
 class PSL:
@@ -82,7 +86,8 @@ class PSL:
 
         # learning settings
         optimizer = ''
-        additional_cli_options = []
+        additional_cli_options = ['--h2path', os.path.abspath(self.working_dir),
+                                  '-D', 'parallel.numthreahds=1']
 
         if self.learner == 'gpp':
             optimizer = 'GaussianProcessPrior'
@@ -114,35 +119,74 @@ class PSL:
         assert self.model_
 
         # add data
-        result = util.get_relational_entities(y_hat=y_hat,
-                                              target_ids=target_ids,
-                                              relations=self.relations,
-                                              data_dir=self.data_dir,
-                                              logger=self.logger)
-        target_priors, relations_dict, target_col = result
+        target_priors, relations_dict, target_col = util.get_relational_entities(y_hat=y_hat,
+                                                                                 target_ids=target_ids,
+                                                                                 relations=self.relations,
+                                                                                 data_dir=self.data_dir,
+                                                                                 logger=self.logger)
 
-        self._add_data(self.model_, target_col=target_col, target_priors=target_priors,
-                       relations_dict=relations_dict)
-
-        # infer
-        results = self.model_.infer(temp_dir=self.working_dir,
-                                    logger=self.logger,
-                                    jvm_options=JVM_OPTIONS)
-
-        # exact udpdated scores
-        y_hat_hat_df = results[self.model_.get_predicate('spam_msg')]
-        y_hat_hat_df.columns = [target_col, 'y_hat_hat']
-        target_df = pd.DataFrame(list(zip(target_ids, y_hat)), columns=[target_col, 'y_hat'])
-        target_df = target_df.merge(y_hat_hat_df, on=target_col, how='left')
-
-        # reshape scores
-        y_hat_hat = target_df['y_hat_hat'].to_numpy()
-        y_score = np.hstack([1 - y_hat_hat.reshape(-1, 1), y_hat_hat.reshape(-1, 1)])
-        assert len(y_score) == len(target_ids)
+        y_score = self._group_inference(target_priors, relations_dict)
 
         return y_score
 
     # private
+    def _group_inference(self, target_priors, relations_dict, target_col='com_id',
+                         max_size=7500, max_edges=40000):
+        """
+        Run inference over clusters of connected components to reduce
+        memory and runtime.
+        """
+        result_df = pd.DataFrame(target_priors, columns=[target_col, 'ind_yhat'])
+
+        clusters = connections.create_clusters(target_priors, relations_dict,
+                                               max_size=MAX_CLUSTER_SIZE,
+                                               max_edges=MAX_EDGES, logger=self.logger)
+
+        # Run inference over each cluster
+        results = []
+        for i, (msg_nodes, hub_nodes, relations, n_edges) in enumerate(clusters):
+            start = time.time()
+
+            # filter target IDs
+            cluster_target_ids = [int(x.split('-')[1]) for x in msg_nodes]
+            temp_df = result_df[result_df[target_col].isin(cluster_target_ids)]
+            cluster_target_priors = list(zip(temp_df[target_col], temp_df['ind_yhat']))
+
+            self._add_data(self.model_, target_col=target_col, target_priors=cluster_target_priors,
+                           relations_dict=relations_dict)
+
+            additional_cli_options = ['--h2path', os.path.abspath(self.working_dir),
+                                      '-D', 'parallel.numthreahds=1']
+
+            result_dict = self.model_.infer(temp_dir=self.working_dir,
+                                            additional_cli_optons=additional_cli_options,
+                                            logger=self.logger,
+                                            jvm_options=JVM_OPTIONS)
+
+            # get udpdated scores
+            yhat_df = result_dict[self.model_.get_predicate('spam_msg')]
+            yhat_df.columns = [target_col, 'pgm_yhat']
+            results.append(yhat_df)
+
+            if self.logger:
+                s = '[CLUSTER {} / {}] msgs: {}, hubs: {}, edges: {}, time: {:.3f}s'
+                self.logger.info(s.format(i + 1, len(clusters), len(msg_nodes),
+                                 len(hub_nodes), n_edges, time.time() - start))
+
+        # put updated scores in order of target IDs
+        yhat_df = pd.concat(results)
+        result_df = result_df.merge(yhat_df, on=target_col, how='left')
+
+        # fill independent target ID nodes with independent predictions
+        result_df['pgm_yhat'] = result_df['pgm_yhat'].fillna(result_df['ind_yhat'])
+
+        # put scores into sklearn format
+        result_df['pgm_yhat_neg'] = 1 - result_df['pgm_yhat']
+        y_score = np.hstack([result_df['pgm_yhat_neg'].values.reshape(-1, 1),
+                             result_df['pgm_yhat'].values.reshape(-1, 1)])
+
+        return y_score
+
     def _add_predicates(self, model, relations):
         """
         Add predicates based on the given relations.
@@ -201,13 +245,17 @@ class PSL:
         for relation_id, relation_list in relations_dict.items():
             relation = relation_id.split('_')[0]
 
+            # organize data
+            relation_df = pd.DataFrame(relation_list, columns=[relation_id, target_col], dtype=int)
+            relation_df = relation_df[relation_df[target_col].isin(target_df[target_col])]
+            hub_df = relation_df.drop_duplicates(subset=[relation_id])
+
+            if len(relation_df) == 0:
+                continue
+
             # filepaths
             relation_fp = os.path.join(self.working_dir, 'has_{}.tsv'.format(relation))
             hub_fp = os.path.join(self.working_dir, 'spam_{}.tsv'.format(relation))
-
-            # organize data
-            relation_df = pd.DataFrame(relation_list, columns=[relation_id, target_col], dtype=int)
-            hub_df = relation_df.drop_duplicates(subset=[relation_id])
 
             # create files
             relation_df.to_csv(relation_fp, columns=[target_col, relation_id], sep=sep, header=None, index=None)
