@@ -26,7 +26,7 @@ for fold in $(seq 0 $n_folds); do
                     sbatch --mem=${mem}G \
                            --time=$time \
                            --partition=$partition \
-                           --job-name=MRF_$dataset \
+                           --job-name=PSL_$dataset \
                            --output=jobs/logs/performance/$dataset \
                            --error=jobs/errors/performance/$dataset \
                            jobs/performance/eggs_runner.sh $dataset $rs \
@@ -42,7 +42,7 @@ for fold in $(seq 0 $n_folds); do
                             sbatch --mem=${mem}G \
                                    --time=$time \
                                    --partition=$partition \
-                                   --job-name=MRF_$dataset \
+                                   --job-name=PSL_$dataset \
                                    --output=jobs/logs/performance/$dataset \
                                    --error=jobs/errors/performance/$dataset \
                                    jobs/performance/eggs_runner.sh $dataset $rs \
