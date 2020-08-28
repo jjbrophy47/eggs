@@ -142,17 +142,19 @@ def create_csv(args, logger):
         for pgm in tqdm(pgm_settings):
             result['pgm'] = pgm
             pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
-            result = _get_result(result, pgm_dir)
+            temp_result = _get_result(result, pgm_dir)
             if result:
                 results.append(result)
+                result = temp_result
 
                 # get PGM + PSL results
                 for psl_learner in tqdm(psl_settings):
                     result['psl'] = psl_learner
                     pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
-                    result = _get_result(result, pgm_psl_dir)
+                    temp_result = _get_result(result, pgm_psl_dir)
                     if result:
                         results.append(result)
+                        result = temp_result
 
         # get SGL results
         for sgl_method, sgl_stacks in tqdm(sgl_settings):
@@ -163,25 +165,28 @@ def create_csv(args, logger):
                                    'sgl_{}'.format(sgl_method),
                                    'stacks_{}'.format(sgl_stacks))
 
-            result = _get_result(result, sgl_dir)
+            temp_result = _get_result(result, sgl_dir)
             if result:
                 results.append(result)
+                result = temp_result
 
             # get SGL + PGM results
             for pgm in tqdm(pgm_settings):
                 result['pgm'] = pgm
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
-                result = _get_result(result, sgl_pgm_dir)
+                temp_result = _get_result(result, sgl_pgm_dir)
                 if result:
                     results.append(result)
+                    result = temp_result
 
                 # get SGL + PGM + PSL results
                 for psl_learner in tqdm(psl_settings):
                     result['psl'] = psl_learner
                     sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(pgm))
-                    result = _get_result(result, sgl_pgm_psl_dir)
+                    temp_result = _get_result(result, sgl_pgm_psl_dir)
                     if result:
                         results.append(result)
+                        result = temp_result
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
