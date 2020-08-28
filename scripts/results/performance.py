@@ -134,8 +134,9 @@ def create_csv(args, logger):
                                    'feature_{}'.format(feature_type),
                                    'test_{}'.format(test_type))
 
-        result = _get_result(result, setting_dir)
-        if result:
+        temp_result = _get_result(result, setting_dir)
+        if temp_result:
+            result = temp_result
             results.append(result)
 
         # get PGM results
@@ -153,8 +154,8 @@ def create_csv(args, logger):
                     pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, pgm_psl_dir)
                     if temp_result:
-                        results.append(result)
                         result = temp_result
+                        results.append(result)
 
         # get SGL results
         for sgl_method, sgl_stacks in tqdm(sgl_settings):
@@ -167,8 +168,8 @@ def create_csv(args, logger):
 
             temp_result = _get_result(result, sgl_dir)
             if temp_result:
-                results.append(result)
                 result = temp_result
+                results.append(result)
 
             # get SGL + PGM results
             for pgm in tqdm(pgm_settings):
@@ -176,8 +177,8 @@ def create_csv(args, logger):
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
                 temp_result = _get_result(result, sgl_pgm_dir)
                 if temp_result:
-                    results.append(result)
                     result = temp_result
+                    results.append(result)
 
                 # get SGL + PGM + PSL results
                 for psl_learner in tqdm(psl_settings):
@@ -185,8 +186,8 @@ def create_csv(args, logger):
                     sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, sgl_pgm_psl_dir)
                     if temp_result:
-                        results.append(result)
                         result = temp_result
+                        results.append(result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
