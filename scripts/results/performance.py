@@ -141,27 +141,24 @@ def create_csv(args, logger):
 
         # get PGM results
         for pgm in pgm_settings:
-            result['pgm'] = pgm
             pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
             temp_result = _get_result(result, pgm_dir)
             if temp_result:
-                results.append(result)
                 result = temp_result
+                result['pgm'] = pgm
+                results.append(result)
 
                 # get PGM + PSL results
                 for psl_learner in psl_settings:
-                    result['psl'] = psl_learner
                     pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, pgm_psl_dir)
                     if temp_result:
                         result = temp_result
+                        result['psl'] = psl_learner
                         results.append(result)
 
         # get SGL results
         for sgl_method, sgl_stacks in sgl_settings:
-            result['sgl_method'] = sgl_method
-            result['sgl_stacks'] = sgl_stacks
-
             sgl_dir = os.path.join(setting_dir,
                                    'sgl_{}'.format(sgl_method),
                                    'stacks_{}'.format(sgl_stacks))
@@ -169,24 +166,26 @@ def create_csv(args, logger):
             temp_result = _get_result(result, sgl_dir)
             if temp_result:
                 result = temp_result
+                result['sgl_method'] = sgl_method
+                result['sgl_stacks'] = sgl_stacks
                 results.append(result)
 
             # get SGL + PGM results
             for pgm in pgm_settings:
-                result['pgm'] = pgm
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
                 temp_result = _get_result(result, sgl_pgm_dir)
                 if temp_result:
                     result = temp_result
+                    result['pgm'] = pgm
                     results.append(result)
 
                 # get SGL + PGM + PSL results
                 for psl_learner in psl_settings:
-                    result['psl'] = psl_learner
                     sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, sgl_pgm_psl_dir)
                     if temp_result:
                         result = temp_result
+                        result['psl'] = psl_learner
                         results.append(result)
 
     pd.set_option('display.max_columns', 100)
