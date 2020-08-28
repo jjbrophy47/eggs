@@ -193,6 +193,11 @@ def create_csv(args, logger):
     pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
+
+    # fill in missing values
+    df['sgl_method'] = df['sgl_method'].fillna('None')
+    df['sgl_stacks'] = df['sgl_stacks'].fillna(0)
+    df['pgm'] = df['pgm'].fillna('None')
     logger.info('\nRaw:\n{}'.format(df))
 
     res_df = process_results(df, logger=logger)
@@ -224,7 +229,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, nargs='+', default=['youtube', 'twitter', 'soundcloud'], help='data.')
     parser.add_argument('--fold', type=str, nargs='+', default=list(range(10)), help='folds.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1], help='random state.')
-    parser.add_argument('--base_estimator', type=str, nargs='+', default=['lr', 'lgb'], help='baseline model.')
+    parser.add_argument('--base_estimator', type=str, nargs='+', default=['lr'], help='baseline model.')
     parser.add_argument('--feature_type', type=str, nargs='+', default=['limited', 'full'], help='features to use.')
     parser.add_argument('--test_type', type=str, nargs='+', default=['inductive', 'full'], help='test instances.')
 
@@ -232,7 +237,7 @@ if __name__ == '__main__':
     parser.add_argument('--sgl_method', type=str, nargs='+', default=['holdout', 'cv'], help='train type.')
     parser.add_argument('--sgl_stacks', type=int, nargs='+', default=[1, 2], help='number of SGL stacks.')
     parser.add_argument('--pgm', type=str, nargs='+', default=['psl', 'mrf'], help='joint model.')
-    parser.add_argument('--psl_learner', type=str, nargs='+', default=['mle', 'gpp'], help='PSL learner.')
+    parser.add_argument('--psl_learner', type=str, nargs='+', default=['mle'], help='PSL learner.')
 
     args = parser.parse_args()
     main(args)
