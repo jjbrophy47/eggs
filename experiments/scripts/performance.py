@@ -200,7 +200,7 @@ if __name__ == '__main__':
     # extra settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
-    parser.add_argument('--append_results', action='store_true', default=False, help='skip finished results.')
+    parser.add_argument('--append_results', action='store_true', default=True, help='skip finished results.')
 
     args = parser.parse_args()
     main(args)
