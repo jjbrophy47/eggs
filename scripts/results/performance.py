@@ -205,7 +205,8 @@ def create_csv(args, logger):
     df['sgl_method'] = df['sgl_method'].fillna('None')
     df['sgl_stacks'] = df['sgl_stacks'].fillna(0).astype(int)
     df['pgm'] = df['pgm'].fillna('None')
-    df['psl'] = df['psl'].fillna('None')
+    if 'psl' in df:
+        df['psl'] = df['psl'].fillna('None')
     logger.info('\nRaw:\n{}'.format(df))
 
     res_df = process_results(df, logger=logger)
