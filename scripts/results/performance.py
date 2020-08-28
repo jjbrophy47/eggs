@@ -192,6 +192,7 @@ def create_csv(args, logger):
     pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
+    logger.info('\nRaw:\n{}'.format(df))
 
     # fill in missing values
     df['sgl_method'] = df['sgl_method'].fillna('None')
