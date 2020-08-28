@@ -143,7 +143,7 @@ def create_csv(args, logger):
             result['pgm'] = pgm
             pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
             temp_result = _get_result(result, pgm_dir)
-            if result:
+            if temp_result:
                 results.append(result)
                 result = temp_result
 
@@ -152,7 +152,7 @@ def create_csv(args, logger):
                     result['psl'] = psl_learner
                     pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, pgm_psl_dir)
-                    if result:
+                    if temp_result:
                         results.append(result)
                         result = temp_result
 
@@ -166,7 +166,7 @@ def create_csv(args, logger):
                                    'stacks_{}'.format(sgl_stacks))
 
             temp_result = _get_result(result, sgl_dir)
-            if result:
+            if temp_result:
                 results.append(result)
                 result = temp_result
 
@@ -175,7 +175,7 @@ def create_csv(args, logger):
                 result['pgm'] = pgm
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
                 temp_result = _get_result(result, sgl_pgm_dir)
-                if result:
+                if temp_result:
                     results.append(result)
                     result = temp_result
 
@@ -184,7 +184,7 @@ def create_csv(args, logger):
                     result['psl'] = psl_learner
                     sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(pgm))
                     temp_result = _get_result(result, sgl_pgm_psl_dir)
-                    if result:
+                    if temp_result:
                         results.append(result)
                         result = temp_result
 
