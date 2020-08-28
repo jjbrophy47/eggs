@@ -72,7 +72,7 @@ def process_results(df, logger):
 
         # average methods over all folds
         settings = ['rs', 'base_estimator', 'feature_type', 'test_type',
-                    'sgl_method', 'sgl_stacks', 'pgm']
+                    'sgl_method', 'sgl_stacks', 'pgm', 'psl']
 
         results = []
         for tup, gf in tqdm(temp_df.groupby(settings)):
