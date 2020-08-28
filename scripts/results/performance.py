@@ -134,28 +134,25 @@ def create_csv(args, logger):
                                    'feature_{}'.format(feature_type),
                                    'test_{}'.format(test_type))
 
-        temp_result = _get_result(result, setting_dir)
-        if temp_result:
-            result = temp_result
-            results.append(result)
+        base_result = _get_result(result, setting_dir)
+        if base_result:
+            results.append(base_result)
 
         # get PGM results
         for pgm in pgm_settings:
             pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
-            temp_result = _get_result(result, pgm_dir)
-            if temp_result:
-                result = temp_result
-                result['pgm'] = pgm
-                results.append(result)
+            base_pgm_result = _get_result(base_result, pgm_dir)
+            if base_pgm_result:
+                base_pgm_result['pgm'] = pgm
+                results.append(base_pgm_result)
 
             # get PGM + PSL results
             for psl_learner in psl_settings:
                 pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(psl_learner))
-                temp_result = _get_result(result, pgm_psl_dir)
-                if temp_result:
-                    result = temp_result
-                    result['psl'] = psl_learner
-                    results.append(result)
+                base_pgm_psl_result = _get_result(base_pgm_result, pgm_psl_dir)
+                if base_pgm_psl_result:
+                    base_pgm_psl_result['psl'] = psl_learner
+                    results.append(base_pgm_psl_result)
 
         # get SGL results
         for sgl_method, sgl_stacks in sgl_settings:
@@ -163,36 +160,32 @@ def create_csv(args, logger):
                                    'sgl_{}'.format(sgl_method),
                                    'stacks_{}'.format(sgl_stacks))
 
-            temp_result = _get_result(result, sgl_dir)
-            if temp_result:
-                result = temp_result
-                result['sgl_method'] = sgl_method
-                result['sgl_stacks'] = sgl_stacks
-                results.append(result)
+            base_sgl_result = _get_result(base_result, sgl_dir)
+            if base_sgl_result:
+                base_sgl_result['sgl_method'] = sgl_method
+                base_sgl_result['sgl_stacks'] = sgl_stacks
+                results.append(base_sgl_result)
 
             # get SGL + PGM results
             for pgm in pgm_settings:
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
-                temp_result = _get_result(result, sgl_pgm_dir)
-                if temp_result:
-                    result = temp_result
-                    result['pgm'] = pgm
-                    results.append(result)
+                base_sgl_pgm_result = _get_result(base_sgl_result, sgl_pgm_dir)
+                if base_sgl_pgm_result:
+                    base_sgl_pgm_result['pgm'] = pgm
+                    results.append(base_sgl_pgm_result)
 
                 # get SGL + PGM + PSL results
                 for psl_learner in psl_settings:
                     sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(psl_learner))
-                    temp_result = _get_result(result, sgl_pgm_psl_dir)
-                    if temp_result:
-                        result = temp_result
-                        result['psl'] = psl_learner
-                        results.append(result)
+                    base_sgl_pgm_psl_result = _get_result(base_sgl_pgm_result, sgl_pgm_psl_dir)
+                    if base_sgl_pgm_psl_result:
+                        base_sgl_pgm_psl_result['psl'] = psl_learner
+                        results.append(base_sgl_pgm_psl_result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
-    logger.info('\nRaw:\n{}'.format(df))
 
     # fill in missing values
     df['sgl_method'] = df['sgl_method'].fillna('None')
