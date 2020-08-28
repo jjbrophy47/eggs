@@ -135,9 +135,9 @@ def create_csv(args, logger):
                                    'feature_{}'.format(feature_type),
                                    'test_{}'.format(test_type))
 
-        result = _get_result(result, setting_dir)
-        if result:
-            results.append(result)
+        temp_result = _get_result(result, setting_dir)
+        if temp_result:
+            results.append(temp_result)
 
         # get PGM results
         for pgm in pgm_settings:
