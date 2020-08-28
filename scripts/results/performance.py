@@ -197,6 +197,7 @@ def create_csv(args, logger):
                             results.append(temp_result)
 
     pd.set_option('display.max_columns', 100)
+    pd.set_option('display.max_rows', 200)
     pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
