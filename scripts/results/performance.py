@@ -53,22 +53,22 @@ def process_results(df, logger):
         logger.info('\nProcessing {}'.format(dataset))
 
         # compute performance difference from baseline
-        fold_list = []
-        for tup, gf in temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator']):
-            base_df = gf[gf['sgl_method'] == 'None']
-            base_df = gf[gf['sgl_stacks'] == 0]
-            base_df = gf[gf['pgm'] == 'None']
+        # fold_list = []
+        # for tup, gf in temp_df.groupby(['fold', 'feature_type', 'test_type', 'rs', 'base_estimator']):
+        #     base_df = gf[gf['sgl_method'] == 'None']
+        #     base_df = gf[gf['sgl_stacks'] == 0]
+        #     base_df = gf[gf['pgm'] == 'None']
 
-            base_auc = base_df['auc'].values[0]
-            base_ap = base_df['ap'].values[0]
+            # base_auc = base_df['auc'].values[0]
+            # base_ap = base_df['ap'].values[0]
 
-            new_gf = gf.copy()
-            new_gf['auc_diff'] = new_gf['auc'] - base_auc
-            new_gf['ap_diff'] = new_gf['ap'] - base_ap
+            # new_gf = gf.copy()
+            # new_gf['auc_diff'] = new_gf['auc'] - base_auc
+            # new_gf['ap_diff'] = new_gf['ap'] - base_ap
 
-            fold_list.append(new_gf)
+            # fold_list.append(new_gf)
 
-        temp_df = pd.concat(fold_list)
+        # temp_df = pd.concat(fold_list)
 
         # average methods over all folds
         settings = ['rs', 'base_estimator', 'feature_type', 'test_type',
@@ -77,15 +77,15 @@ def process_results(df, logger):
         results = []
         for tup, gf in tqdm(temp_df.groupby(settings)):
             result = {k: v for k, v in zip(settings, tup)}
-            result['auc_mean'] = gf['auc'].mean()
-            result['ap_mean'] = gf['ap'].mean()
-            result['auc_std'] = gf['auc'].std()
-            result['ap_std'] = gf['ap'].std()
+            # result['auc_mean'] = gf['auc'].mean()
+            # result['ap_mean'] = gf['ap'].mean()
+            # result['auc_std'] = gf['auc'].std()
+            # result['ap_std'] = gf['ap'].std()
 
-            result['auc_diff_mean'] = gf['auc_diff'].mean()
-            result['ap_diff_mean'] = gf['ap_diff'].mean()
-            result['auc_diff_std'] = sem(gf['auc_diff'])
-            result['ap_diff_std'] = sem(gf['ap_diff'])
+            # result['auc_diff_mean'] = gf['auc_diff'].mean()
+            # result['ap_diff_mean'] = gf['ap_diff'].mean()
+            # result['auc_diff_std'] = sem(gf['auc_diff'])
+            # result['ap_diff_std'] = sem(gf['ap_diff'])
 
             # concatenate folds and compute scores
             label_list = []
