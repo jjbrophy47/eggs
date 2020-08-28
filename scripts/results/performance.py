@@ -134,57 +134,67 @@ def create_csv(args, logger):
                                    'feature_{}'.format(feature_type),
                                    'test_{}'.format(test_type))
 
-        base_result = _get_result(result, setting_dir)
-        if base_result:
-            results.append(base_result)
+        result = _get_result(result, setting_dir)
+        if result:
+            results.append(result)
 
         # get PGM results
         for pgm in pgm_settings:
+            pgm_result = result.copy()
+            pgm_result['pgm'] = pgm
+
             pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
-            base_pgm_result = _get_result(base_result, pgm_dir)
-            if base_pgm_result:
-                base_pgm_result['pgm'] = pgm
-                results.append(base_pgm_result)
+            temp_result = _get_result(pgm_result, pgm_dir)
+            if temp_result:
+                results.append(temp_result)
 
             if pgm == 'psl':
 
                 # get PGM + PSL results
                 for psl_learner in psl_settings:
+                    pgm_psl_result = pgm_result.copy()
+                    pgm_psl_result['psl'] = psl_learner
+
                     pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(psl_learner))
-                    base_pgm_psl_result = _get_result(base_pgm_result, pgm_psl_dir)
-                    if base_pgm_psl_result:
-                        base_pgm_psl_result['psl'] = psl_learner
-                        results.append(base_pgm_psl_result)
+                    temp_result = _get_result(pgm_psl_result, pgm_psl_dir)
+                    if temp_result:
+                        results.append(temp_result)
 
         # get SGL results
         for sgl_method, sgl_stacks in sgl_settings:
+            sgl_result = result.copy()
+            sgl_result['sgl_method'] = sgl_method
+            sgl_result['sgl_stacks'] = sgl_stacks
+
             sgl_dir = os.path.join(setting_dir,
                                    'sgl_{}'.format(sgl_method),
                                    'stacks_{}'.format(sgl_stacks))
 
-            base_sgl_result = _get_result(base_result, sgl_dir)
-            if base_sgl_result:
-                base_sgl_result['sgl_method'] = sgl_method
-                base_sgl_result['sgl_stacks'] = sgl_stacks
-                results.append(base_sgl_result)
+            temp_result = _get_result(sgl_result, sgl_dir)
+            if temp_result:
+                results.append(temp_result)
 
             # get SGL + PGM results
             for pgm in pgm_settings:
+                sgl_pgm_result = sgl_result.copy()
+                sgl_pgm_result['pgm'] = pgm
+
                 sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
-                base_sgl_pgm_result = _get_result(base_sgl_result, sgl_pgm_dir)
-                if base_sgl_pgm_result:
-                    base_sgl_pgm_result['pgm'] = pgm
-                    results.append(base_sgl_pgm_result)
+                temp_result = _get_result(sgl_pgm_result, sgl_pgm_dir)
+                if temp_result:
+                    results.append(temp_result)
 
                 if pgm == 'psl':
 
                     # get SGL + PGM + PSL results
                     for psl_learner in psl_settings:
+                        sgl_pgm_psl_result = sgl_pgm_result.copy()
+                        sgl_pgm_psl_result['psl'] = psl_learner
+
                         sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(psl_learner))
-                        base_sgl_pgm_psl_result = _get_result(base_sgl_pgm_result, sgl_pgm_psl_dir)
-                        if base_sgl_pgm_psl_result:
-                            base_sgl_pgm_psl_result['psl'] = psl_learner
-                            results.append(base_sgl_pgm_psl_result)
+                        temp_result = _get_result(sgl_pgm_psl_result, sgl_pgm_psl_dir)
+                        if temp_result:
+                            results.append(temp_result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
