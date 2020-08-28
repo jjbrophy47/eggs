@@ -150,7 +150,7 @@ def create_csv(args, logger):
 
                 # get PGM + PSL results
                 for psl_learner in psl_settings:
-                    pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
+                    pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(psl_learner))
                     temp_result = _get_result(result, pgm_psl_dir)
                     if temp_result:
                         result = temp_result
