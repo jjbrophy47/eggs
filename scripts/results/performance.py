@@ -191,7 +191,7 @@ def create_csv(args, logger):
                         sgl_pgm_psl_result = sgl_pgm_result.copy()
                         sgl_pgm_psl_result['psl'] = psl_learner
 
-                        sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(psl_learner))
+                        sgl_pgm_psl_dir = os.path.join(sgl_pgm_dir, 'psl_{}'.format(psl_learner))
                         temp_result = _get_result(sgl_pgm_psl_result, sgl_pgm_psl_dir)
                         if temp_result:
                             results.append(temp_result)
