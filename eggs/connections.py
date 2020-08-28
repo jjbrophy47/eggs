@@ -54,12 +54,11 @@ def _build_networkx_graph(prior_df, relations_dict, target_col='com_id', logger=
         relation_df = relation_df[relation_df[target_col].isin(prior_df[target_col].unique())]
 
         for j, (hub_id, target_id) in enumerate(zip(relation_df[relation_col], relation_df[target_col])):
-            if j % 100 == 0:
+            graph.add_edge('{}-{}'.format(target_col, target_id), '{}-{}'.format(relation_col, hub_id))
+
+            if j % 1000 == 0:
                 if logger:
                     logger.info('[CONNECTION {} / {}]'.format(j, len(relation_df)))
-
-            if target_id in prior_df[target_col].unique():
-                graph.add_edge('{}-{}'.format(target_col, target_id), '{}-{}'.format(relation_col, hub_id))
 
     components = list(nx.connected_components(graph))
 
