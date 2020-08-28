@@ -148,14 +148,14 @@ def create_csv(args, logger):
                 result['pgm'] = pgm
                 results.append(result)
 
-                # get PGM + PSL results
-                for psl_learner in psl_settings:
-                    pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(psl_learner))
-                    temp_result = _get_result(result, pgm_psl_dir)
-                    if temp_result:
-                        result = temp_result
-                        result['psl'] = psl_learner
-                        results.append(result)
+            # get PGM + PSL results
+            for psl_learner in psl_settings:
+                pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(psl_learner))
+                temp_result = _get_result(result, pgm_psl_dir)
+                if temp_result:
+                    result = temp_result
+                    result['psl'] = psl_learner
+                    results.append(result)
 
         # get SGL results
         for sgl_method, sgl_stacks in sgl_settings:
