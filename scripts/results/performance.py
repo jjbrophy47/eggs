@@ -114,8 +114,8 @@ def create_csv(args, logger):
                               args.feature_type, args.test_type]))
 
     sgl_settings = list(product(*[args.sgl_method, args.sgl_stacks]))
-    pgm_settings = list(args.pgm)
-    psl_settings = list(args.psl_learner)
+    pgm_settings = args.pgm
+    psl_settings = args.psl_learner
 
     results = []
 
