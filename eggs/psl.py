@@ -156,7 +156,7 @@ class PSL:
                            relations_dict=relations_dict)
 
             additional_cli_options = ['--h2path', os.path.abspath(self.working_dir),
-                                      '-D', 'parallel.numthreahds=1']
+                                      '-D', 'parallel.numthreads=1']
 
             result_dict = self.model_.infer(temp_dir=self.working_dir,
                                             additional_cli_optons=additional_cli_options,
@@ -184,6 +184,8 @@ class PSL:
         result_df['pgm_yhat_neg'] = 1 - result_df['pgm_yhat']
         y_score = np.hstack([result_df['pgm_yhat_neg'].values.reshape(-1, 1),
                              result_df['pgm_yhat'].values.reshape(-1, 1)])
+
+        assert len(y_score) == len(target_priors)
 
         return y_score
 

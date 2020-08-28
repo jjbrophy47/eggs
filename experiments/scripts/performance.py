@@ -140,6 +140,7 @@ def main(args):
                            'test_{}'.format(args.test_type))
 
     if args.sgl_method in ['holdout', 'cv']:
+        assert args.sgl_stacks in [1, 2]
         out_dir = os.path.join(out_dir,
                                'sgl_{}'.format(args.sgl_method),
                                'stacks_{}'.format(args.sgl_stacks))
