@@ -110,37 +110,78 @@ def process_results(df, logger):
 
 def create_csv(args, logger):
 
-    experiment_settings = list(product(*[args.dataset, args.fold, args.rs, args.base_estimator,
-                                         args.feature_type, args.test_type,
-                                         args.sgl_method, args.sgl_stacks, args.pgm]))
+    settings = list(product(*[args.dataset, args.fold, args.rs, args.base_estimator,
+                              args.feature_type, args.test_type]))
+
+    sgl_settings = list(product(*[args.sgl_method, args.sgl_stacks]))
+    pgm_settings = list(args.pgm)
+    psl_settings = list(args.psl_learner)
 
     results = []
-    for experiment_tuple in tqdm(experiment_settings):
-        dataset, fold, rs, base_estimator, feature_type, test_type, sgl_method, sgl_stacks, pgm = experiment_tuple
+
+    # get baseline results
+    for setting_tup in tqdm(settings):
+        dataset, fold, rs, base_estimator, feature_type, test_type = setting_tup
 
         result = {'dataset': dataset, 'fold': fold, 'rs': rs, 'base_estimator': base_estimator,
-                  'feature_type': feature_type, 'test_type': test_type,
-                  'sgl_method': sgl_method, 'sgl_stacks': sgl_stacks, 'pgm': pgm}
+                  'feature_type': feature_type, 'test_type': test_type}
 
-        experiment_dir = os.path.join(args.in_dir,
-                                      dataset,
-                                      'fold_{}'.format(fold),
-                                      'rs_{}'.format(rs),
-                                      'base_{}'.format(base_estimator),
-                                      'feature_{}'.format(feature_type),
-                                      'test_{}'.format(test_type),
-                                      'sgl_{}'.format(sgl_method),
-                                      'stacks_{}'.format(sgl_stacks),
-                                      'pgm_{}'.format(pgm))
+        setting_dir = os.path.join(args.in_dir,
+                                   dataset,
+                                   'fold_{}'.format(fold),
+                                   'rs_{}'.format(rs),
+                                   'base_{}'.format(base_estimator),
+                                   'feature_{}'.format(feature_type),
+                                   'test_{}'.format(test_type))
 
-        # skip empty experiments
-        if not os.path.exists(experiment_dir):
-            continue
-
-        result = _get_result(result, experiment_dir)
-
+        result = _get_result(result, setting_dir)
         if result:
             results.append(result)
+
+        # get PGM results
+        for pgm in tqdm(pgm_settings):
+            result['pgm'] = pgm
+            pgm_dir = os.path.join(setting_dir, 'pgm_{}'.format(pgm))
+            result = _get_result(result, pgm_dir)
+            if result:
+                results.append(result)
+
+                # get PGM + PSL results
+                for psl_learner in tqdm(psl_settings):
+                    result['psl'] = psl_learner
+                    pgm_psl_dir = os.path.join(pgm_dir, 'psl_{}'.format(pgm))
+                    result = _get_result(result, pgm_psl_dir)
+                    if result:
+                        results.append(result)
+
+        # get SGL results
+        for sgl_method, sgl_stacks in tqdm(sgl_settings):
+            result['sgl_method'] = sgl_method
+            result['sgl_stacks'] = sgl_stacks
+
+            sgl_dir = os.path.join(setting_dir,
+                                   'sgl_{}'.format(sgl_method),
+                                   'stacks_{}'.format(sgl_stacks))
+
+            result = _get_result(result, sgl_dir)
+            if result:
+                results.append(result)
+
+            # get SGL + PGM results
+            for pgm in tqdm(pgm_settings):
+                result['pgm'] = pgm
+                sgl_pgm_dir = os.path.join(sgl_dir, 'pgm_{}'.format(pgm))
+                result = _get_result(result, sgl_pgm_dir)
+                if result:
+                    results.append(result)
+
+                # get SGL + PGM + PSL results
+                for psl_learner in tqdm(psl_settings):
+                    result['psl'] = psl_learner
+                    sgl_pgm_psl_dir = os.path.join(sgl_dir, 'psl_{}'.format(pgm))
+                    result = _get_result(result, sgl_pgm_psl_dir)
+                    if result:
+                        results.append(result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
@@ -185,6 +226,7 @@ if __name__ == '__main__':
     parser.add_argument('--sgl_method', type=str, nargs='+', default=['None', 'holdout', 'cv'], help='train type.')
     parser.add_argument('--sgl_stacks', type=int, nargs='+', default=[0, 1, 2], help='number of SGL stacks.')
     parser.add_argument('--pgm', type=str, nargs='+', default=['None', 'psl', 'mrf'], help='joint model.')
+    parser.add_argument('--psl_learner', type=str, nargs='+', default=['mle', 'gpp'], help='PSL learner.')
 
     args = parser.parse_args()
     main(args)

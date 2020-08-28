@@ -137,12 +137,18 @@ def main(args):
                            'rs_{}'.format(args.rs),
                            'base_{}'.format(args.base_estimator),
                            'feature_{}'.format(args.feature_type),
-                           'test_{}'.format(args.test_type),
-                           'sgl_{}'.format(args.sgl_method),
-                           'stacks_{}'.format(args.sgl_stacks),
-                           'pgm_{}'.format(args.pgm))
-    if args.pgm == 'psl':
-        out_dir = os.path.join(out_dir, 'psl_{}'.format(args.psl_learner))
+                           'test_{}'.format(args.test_type))
+
+    if args.sgl_method in ['holdout', 'cv']:
+        out_dir = os.path.join(out_dir,
+                               'sgl_{}'.format(args.sgl_method),
+                               'stacks_{}'.format(args.sgl_stacks))
+
+    if args.pgm in ['psl', 'mrf']:
+        out_dir = os.path.join(out_dir, 'pgm_{}'.format(args.pgm))
+
+        if args.pgm == 'psl' and args.psl_learner in ['mle', 'gpp']:
+            out_dir = os.path.join(out_dir, 'psl_{}'.format(args.psl_learner))
 
     log_fp = os.path.join(out_dir, 'log.txt')
     os.makedirs(out_dir, exist_ok=True)
