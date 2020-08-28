@@ -223,9 +223,9 @@ if __name__ == '__main__':
     parser.add_argument('--test_type', type=str, nargs='+', default=['inductive', 'full'], help='test instances.')
 
     # EGGS settings
-    parser.add_argument('--sgl_method', type=str, nargs='+', default=['None', 'holdout', 'cv'], help='train type.')
-    parser.add_argument('--sgl_stacks', type=int, nargs='+', default=[0, 1, 2], help='number of SGL stacks.')
-    parser.add_argument('--pgm', type=str, nargs='+', default=['None', 'psl', 'mrf'], help='joint model.')
+    parser.add_argument('--sgl_method', type=str, nargs='+', default=['holdout', 'cv'], help='train type.')
+    parser.add_argument('--sgl_stacks', type=int, nargs='+', default=[1, 2], help='number of SGL stacks.')
+    parser.add_argument('--pgm', type=str, nargs='+', default=['psl', 'mrf'], help='joint model.')
     parser.add_argument('--psl_learner', type=str, nargs='+', default=['mle', 'gpp'], help='PSL learner.')
 
     args = parser.parse_args()
