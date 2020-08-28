@@ -97,6 +97,7 @@ def process_results(df, logger):
             yhat = np.concatenate(yhat_list)
             result['auc'] = roc_auc_score(label, yhat)
             result['ap'] = average_precision_score(label, yhat)
+            result['count'] = len(gf)
 
             result['dataset'] = dataset
             results.append(result)
