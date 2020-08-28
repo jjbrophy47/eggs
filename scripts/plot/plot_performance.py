@@ -120,8 +120,6 @@ def main(args):
     main_fp = os.path.join(args.in_dir, 'results.csv')
     main_df = pd.read_csv(main_fp)
 
-    print(main_df[main_df['dataset'] == 'twitter'])
-
     for i, (feature_type, test_type) in enumerate(settings):
         ax = axs[i]
 
