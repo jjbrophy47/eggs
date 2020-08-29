@@ -14,8 +14,8 @@ from . import connections
 from . import util
 
 
-MAX_CLUSTER_SIZE = 40000
-MAX_EDGES = 40000
+MAX_CLUSTER_SIZE = 10000
+MAX_EDGES = 10000
 
 
 class MRF:

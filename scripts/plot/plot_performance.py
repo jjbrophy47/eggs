@@ -52,8 +52,9 @@ def organize_results(args, df, feature_type, test_type, methods):
         base_df = base_df[base_df['sgl_stacks'] == 0]
         base_df = base_df[base_df['pgm'] == 'None']
 
+        result['baseline'] = 1 - base_df[args.metric].values[0]
         # result['baseline'] = 1 - base_df[args.metric].values[0]
-        # method_list.append('baseline')
+        method_list.append('baseline')
 
         # add methods
         for sgl_method, sgl_stacks, pgm in methods:
@@ -66,7 +67,8 @@ def organize_results(args, df, feature_type, test_type, methods):
 
             key = '{}_{}_{}'.format(sgl_method, sgl_stacks, pgm)
 
-            value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
+            value = 1 - temp3[args.metric].values[0]
+            # value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
             # value = 1 - temp3[args.metric].values[0]
 
             result[key] = value
@@ -76,8 +78,6 @@ def organize_results(args, df, feature_type, test_type, methods):
 
         results.append(result)
     res_df = pd.DataFrame(results)
-
-    print(res_df)
 
     return res_df, method_list, std_list, n_datasets
 
@@ -89,13 +89,12 @@ def main(args):
                 ('limited', 'full'), ('limited', 'inductive')]
 
     methods = [('holdout', 1, 'None'), ('holdout', 2, 'None'),
-               ('cv', 1, 'None'), ('cv', 2, 'None'),
-               ('None', 0, 'mrf'),
-               ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf'),
-               ('cv', 1, 'mrf'), ('cv', 2, 'mrf')]
+               ('None', 0, 'mrf'), ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf'),
+               ('None', 0, 'psl'), ('holdout', 1, 'psl'), ('holdout', 2, 'psl')]
 
-    labels = ['Holdout (1)', 'Holdout (2)', 'CV (1)', 'CV (2)', 'MRF only',
-              'Holdout (1) + MRF', 'Holdout (2) + MRF', 'CV (1) + MRF', 'CV (2) + MRF']
+    labels = ['Baseline', 'Holdout (1)', 'Holdout (2)',
+              'MRF only', 'Holdout (1) + MRF', 'Holdout (2) + MRF',
+              'PSL only', 'Holdout (1) + PSL', 'Holdout (2) + PSL']
 
     # matplotlib settings
     plt.rc('font', family='serif')
@@ -113,7 +112,7 @@ def main(args):
     width, height = set_size(width=width * 3, fraction=1, subplots=(len(settings), 3))
     fig, axs = plt.subplots(len(settings), 1, figsize=(width, height * 0.93), sharex=True, sharey=True)
 
-    colors = ['0.5', '0.25', '0.5', '0.25', '1.0', '0.5', '0.25', '0.5', '0.25']
+    colors = ['0.5', '1.0', '0.75', '1.0', '0.75', '0.5', '1.0', '0.75', '0.5']
     hatches = ['-', '+', 'x', '\\', '*', 'o', 'O', '.', '/']
 
     # get results
@@ -147,11 +146,12 @@ def main(args):
         ax.set_title('Feature: {}, Test samples: {}'.format(feature_type.capitalize(), test_label), loc='left')
         ax.grid(which='major', axis='y')
         ax.set_axisbelow(True)
-        ax.set_ylabel(r'Test {} $\Delta$ (%)'.format(args.metric))
+        ax.set_ylabel('Test Error')
+        ax.set_xlabel('Dataset')
         ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=0)
 
         if i == 0:
-            leg = ax.legend(labels=labels, ncol=1, framealpha=1.0, loc='upper left')
+            leg = ax.legend(labels=labels, ncol=1, framealpha=1.0, loc='upper center')
 
         if i > 0:
             ax.get_legend().remove()
