@@ -286,9 +286,9 @@ def main(args):
         result = make_dataset(args, fold_df, fold, out_dir, logger)
 
         if result == -1:
-            exit('Not enough positive samples!')
-
-        fold += 1
+            logger.info('not enough positive samples, skipping fold')
+        else:
+            fold += 1
 
     logger.info('total no. valid folds: {}'.format(fold))
     util.remove_logger(logger)
