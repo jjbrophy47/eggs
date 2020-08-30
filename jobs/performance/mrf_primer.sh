@@ -10,7 +10,7 @@ feature_type_list=('full' 'limited')
 test_type_list=('full' 'inductive')
 base_estimator_list=('lr')
 
-sgl_method_list=('holdout' 'cv')
+sgl_method_list=('holdout')
 sgl_stacks_list=(1 2)
 pgm_list=('mrf')
 
