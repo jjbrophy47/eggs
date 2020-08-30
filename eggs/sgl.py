@@ -136,41 +136,72 @@ class SGL:
 
     def _holdout(self, Xg, y, target_ids):
         """
-        Sequentailly trains stacked learners with pseudo-relational features.
+        Sequentailly trains stacked learners with pseudo-relational features
+        using all of the training data for each stack.
         """
-
-        self.stacked_models_ = []
 
         # note: pr_features[i][j] is X_r for data piece j using predictions from model i
         pr_features = defaultdict(dict)
 
-        # split data into equal-sized pieces
-        Xg_list = []
-        y_list = []
-        target_ids_list = []
-        incrementer = int(Xg.shape[0] / (self.stacks + 1))
-
-        for i in range(self.stacks + 1):
-            start_ndx = i * incrementer if i > 0 else None
-            end_ndx = (i + 1) * incrementer if i < self.stacks else None
-
-            Xg_list.append(Xg[start_ndx:end_ndx])
-            y_list.append(y[start_ndx:end_ndx])
-            target_ids_list.append(target_ids[start_ndx:end_ndx])
+        self.stacked_models_ = []
 
         # fit a base model, and stacked models using pseudo-relational features
         for i in range(self.stacks + 1):
             start = time.time()
 
-            X = Xg_list[i] if i == 0 else util.hstack([Xg_list[i], pr_features[i - 1][i]])
-            fit_model = clone(self.estimator).fit(X, y_list[i])
+            X = Xg if i == 0 else util.hstack([Xg, pr_features[i - 1]])
+            fit_model = clone(self.estimator).fit(X, y)
             self.stacked_models_.append(fit_model)
 
             # generate predictions for all subsequent data pieces
-            for j in range(i + 1, self.stacks + 1):
-                X = Xg_list[j] if i == 0 else util.hstack([Xg_list[j], pr_features[i - 1][j]])
+            y_hat = fit_model.predict_proba(X)[:, 1]
+            Xr, Xr_cols = util.pseudo_relational_features(y_hat, target_ids,
+                                                          relations=self.relations,
+                                                          data_dir=self.data_dir)
+            pr_features[i] = Xr
+
+            if self.logger:
+                self.logger.info('stack {}: {:.3f}s'.format(i, time.time() - start))
+
+        # save pseudo-relational features
+        self.Xr_cols = Xr_cols
+
+    def _holdout_old(self, Xg, y, target_ids):
+        """
+        Sequentailly trains stacked learners with pseudo-relational features.
+        Trains a base learner on all data, and subseqent learners on
+        mutually exclusive pieces of the data.
+        """
+
+        # note: pr_features[i][j] is X_r for data piece j using predictions from model i
+        pr_features = defaultdict(dict)
+
+        self.base_model_ = clone(self.estimator).fit(Xg, y)
+        self.stacked_models_ = []
+
+        Xg_array = self._array_split(Xg, self.stacks + 1)
+        y_array = self._array_split(y, self.stacks + 1)
+        target_ids_array = self._array_split(target_ids, self.stacks + 1)
+
+        # fit a base model, and stacked models using pseudo-relational features
+        for i in range(self.stacks):
+            start = time.time()
+
+            # X = Xg_array[i] if i == 0 else util.hstack([Xg_array[i], pr_features[i - 1][i]])
+            X = Xg if i == 0 else util.hstack([Xg, pr_features[i - 1][i]])
+            # fit_model = clone(self.estimator).fit(X, y_array[i])
+            fit_model = clone(self.estimator).fit(X, y)
+            self.stacked_models_.append(fit_model)
+
+            # generate predictions for all subsequent data pieces
+            for j in range(i + 1, self.stacks):
+                # X = Xg_array[j] if i == 0 else util.hstack([Xg_array[j], pr_features[i - 1][j]])
+                X = Xg if i == 0 else util.hstack([Xg, pr_features[i - 1][j]])
                 y_hat = fit_model.predict_proba(X)[:, 1]
-                Xr, Xr_cols = util.pseudo_relational_features(y_hat, target_ids_list[j],
+                # Xr, Xr_cols = util.pseudo_relational_features(y_hat, target_ids_array[j],
+                #                                               relations=self.relations,
+                #                                               data_dir=self.data_dir)
+                Xr, Xr_cols = util.pseudo_relational_features(y_hat, target_ids,
                                                               relations=self.relations,
                                                               data_dir=self.data_dir)
                 pr_features[i][j] = Xr
@@ -180,3 +211,25 @@ class SGL:
 
         # save pseudo-relational features
         self.Xr_cols = Xr_cols
+
+    def _array_split(self, X, splits):
+        """
+        Splits sparse array into equal-sized pieces.
+        """
+
+        assert splits > 1
+
+        array_list = []
+        n = X.shape[0]
+        incrementer = int(n / splits)
+
+        for i in range(1, splits + 1):
+
+            if i == splits:
+                array_fragment = X[(i - 1) * incrementer:]
+            else:
+                array_fragment = X[(i - 1) * incrementer: i * incrementer]
+
+            array_list.append(array_fragment)
+
+        return np.array(array_list)

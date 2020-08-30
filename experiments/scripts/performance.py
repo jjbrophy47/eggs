@@ -140,7 +140,7 @@ def main(args):
                            'test_{}'.format(args.test_type))
 
     if args.sgl_method in ['holdout', 'cv']:
-        assert args.sgl_stacks in [1, 2]
+        assert args.sgl_stacks > 0
         out_dir = os.path.join(out_dir,
                                'sgl_{}'.format(args.sgl_method),
                                'stacks_{}'.format(args.sgl_stacks))
@@ -156,6 +156,7 @@ def main(args):
 
     # skip experiment if results already exist
     if args.append_results and os.path.exists(log_fp.replace('log.txt', 'result.npy')):
+        print('skipping experiment')
         return
 
     # create logger
@@ -200,7 +201,7 @@ if __name__ == '__main__':
     # extra settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
-    parser.add_argument('--append_results', action='store_true', default=True, help='skip finished results.')
+    parser.add_argument('--append_results', action='store_true', default=False, help='skip finished results.')
 
     args = parser.parse_args()
     main(args)
