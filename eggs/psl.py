@@ -175,9 +175,7 @@ class PSL:
 
         # put updated scores in order of target IDs
         yhat_df = pd.concat(results)
-
-        # average duplicated messages that were put into different clusters
-        yhat_df = yhat_df.groupby(target_col).mean().reset_index(drop=True)
+        yhat_df = yhat_df.groupby(target_col).mean().reset_index()
         result_df = result_df.merge(yhat_df, on=target_col, how='left')
 
         # fill independent target ID nodes with independent predictions
