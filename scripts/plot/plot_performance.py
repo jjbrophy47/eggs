@@ -52,9 +52,8 @@ def organize_results(args, df, feature_type, test_type, methods):
         base_df = base_df[base_df['sgl_stacks'] == 0]
         base_df = base_df[base_df['pgm'] == 'None']
 
-        result['baseline'] = 1 - base_df[args.metric].values[0]
         # result['baseline'] = 1 - base_df[args.metric].values[0]
-        method_list.append('baseline')
+        # method_list.append('baseline')
 
         # add methods
         for sgl_method, sgl_stacks, pgm in methods:
@@ -67,8 +66,8 @@ def organize_results(args, df, feature_type, test_type, methods):
 
             key = '{}_{}_{}'.format(sgl_method, sgl_stacks, pgm)
 
-            value = 1 - temp3[args.metric].values[0]
-            # value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
+            # value = 1 - temp3[args.metric].values[0]
+            value = temp3[args.metric].values[0] - base_df[args.metric].values[0]
             # value = 1 - temp3[args.metric].values[0]
 
             result[key] = value
@@ -89,12 +88,13 @@ def main(args):
                 ('limited', 'full'), ('limited', 'inductive')]
 
     methods = [('holdout', 1, 'None'), ('holdout', 2, 'None'),
-               ('None', 0, 'mrf'), ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf'),
-               ('None', 0, 'psl'), ('holdout', 1, 'psl'), ('holdout', 2, 'psl')]
+               ('None', 0, 'mrf'), ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf')]
+               # ('None', 0, 'psl'), ('holdout', 1, 'psl'), ('holdout', 2, 'psl')]
 
-    labels = ['Baseline', 'Holdout (1)', 'Holdout (2)',
-              'MRF only', 'Holdout (1) + MRF', 'Holdout (2) + MRF',
-              'PSL only', 'Holdout (1) + PSL', 'Holdout (2) + PSL']
+    # labels = ['Baseline', 'Holdout (1)', 'Holdout (2)',
+    labels = ['Holdout (1)', 'Holdout (2)',
+              'MRF only', 'Holdout (1) + MRF', 'Holdout (2) + MRF']
+              # 'PSL only', 'Holdout (1) + PSL', 'Holdout (2) + PSL']
 
     # matplotlib settings
     plt.rc('font', family='serif')
