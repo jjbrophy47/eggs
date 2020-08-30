@@ -14,7 +14,6 @@ base_estimator=$5
 fold=$6
 
 python3 experiments/scripts/performance.py \
-  --append_results \
   --dataset $dataset \
   --rs $rs \
   --feature_type $feature_type \
