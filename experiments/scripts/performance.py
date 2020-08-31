@@ -18,6 +18,8 @@ from scipy.sparse import load_npz
 import eggs
 import util
 
+NUM_LEAVES = 2 ** 10
+
 
 def _get_model(args, data_dir, logger):
     """
@@ -29,6 +31,7 @@ def _get_model(args, data_dir, logger):
     elif args.base_estimator == 'lgb':
         base_estimator = lgb.LGBMClassifier(n_estimators=args.n_estimators,
                                             max_depth=args.max_depth,
+                                            num_leaves=NUM_LEAVES,
                                             random_state=args.rs)
     else:
         raise ValueError('base_estimator {} unknown!'.format(args.base_estimator))

@@ -88,13 +88,13 @@ def main(args):
                 ('limited', 'full'), ('limited', 'inductive')]
 
     methods = [('holdout', 1, 'None'), ('holdout', 2, 'None'),
-               ('None', 0, 'mrf'), ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf')]
-               # ('None', 0, 'psl'), ('holdout', 1, 'psl'), ('holdout', 2, 'psl')]
+               ('None', 0, 'mrf'), ('holdout', 1, 'mrf'), ('holdout', 2, 'mrf'),
+               ('None', 0, 'psl'), ('holdout', 1, 'psl'), ('holdout', 2, 'psl')]
 
     # labels = ['Baseline', 'Holdout (1)', 'Holdout (2)',
     labels = ['Holdout (1)', 'Holdout (2)',
-              'MRF only', 'Holdout (1) + MRF', 'Holdout (2) + MRF']
-              # 'PSL only', 'Holdout (1) + PSL', 'Holdout (2) + PSL']
+              'MRF only', 'Holdout (1) + MRF', 'Holdout (2) + MRF',
+              'PSL only', 'Holdout (1) + PSL', 'Holdout (2) + PSL']
 
     # matplotlib settings
     plt.rc('font', family='serif')
