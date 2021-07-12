@@ -17,10 +17,12 @@ Install
         * Requires Java 8.
         * Install the package `pslpython`.
     * Libra LINK 
-
+                                        
+Paper
 ---
-Changelog
-===
-
-### [0.1.0] - 2020-07-21
-* Initial version.
+@article{brophy2020eggs,
+  title={Eggs: A flexible approach to relational modeling of social network spam},
+  author={Brophy, Jonathan and Lowd, Daniel},
+  journal={arXiv preprint arXiv:2001.04909},
+  year={2020}
+}
