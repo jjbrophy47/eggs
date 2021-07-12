@@ -20,9 +20,11 @@ Install
                                         
 Paper
 ---
+```
 @article{brophy2020eggs,
   title={Eggs: A flexible approach to relational modeling of social network spam},
   author={Brophy, Jonathan and Lowd, Daniel},
   journal={arXiv preprint arXiv:2001.04909},
   year={2020}
 }
+```
